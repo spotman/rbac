@@ -1,0 +1,48 @@
+<?php
+namespace Spotman\Acl\Resolver;
+
+use Spotman\Acl\Acl;
+use Spotman\Acl\UserInterface;
+use Spotman\Acl\ResourceInterface;
+
+class UserAccessResolver implements AccessResolverInterface
+{
+    /**
+     * @var Acl
+     */
+    private $acl;
+
+    /**
+     * @var UserInterface
+     */
+    private $user;
+
+    /**
+     * UserAccessResolver constructor.
+     *
+     * @param \Spotman\Acl\Acl           $acl
+     * @param \Spotman\Acl\UserInterface $user
+     */
+    public function __construct(Acl $acl, UserInterface $user)
+    {
+        $this->user = $user;
+        $this->acl  = $acl;
+    }
+
+    /**
+     * @param \Spotman\Acl\ResourceInterface $resource
+     * @param                                $permissionIdentity
+     *
+     * @return bool
+     */
+    public function isAllowed(ResourceInterface $resource, $permissionIdentity)
+    {
+        return $this->acl->isAllowedToUser($resource, $permissionIdentity, $this->user);
+    }
+
+    public function setUser(UserInterface $user)
+    {
+        $this->user = $user;
+        return $this;
+    }
+}
