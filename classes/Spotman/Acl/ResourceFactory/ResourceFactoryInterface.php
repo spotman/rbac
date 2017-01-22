@@ -1,5 +1,7 @@
 <?php
-namespace Spotman\Acl;
+namespace Spotman\Acl\ResourceFactory;
+
+use Spotman\Acl\ResourceInterface;
 
 interface ResourceFactoryInterface
 {

@@ -1,5 +1,7 @@
 <?php
-namespace Spotman\Acl;
+namespace Spotman\Acl\PermissionsCollector;
+
+use Spotman\Acl\Acl;
 
 /**
  * Class AbstractPermissionsCollector

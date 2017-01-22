@@ -2,7 +2,7 @@
 namespace Spotman\Acl\Resolver;
 
 use Spotman\Acl\Acl;
-use Spotman\Acl\RoleInterface;
+use Spotman\Acl\AclRoleInterface;
 use Spotman\Acl\ResourceInterface;
 
 class RoleAccessResolver implements AccessResolverInterface
@@ -13,7 +13,7 @@ class RoleAccessResolver implements AccessResolverInterface
     private $acl;
 
     /**
-     * @var RoleInterface
+     * @var AclRoleInterface
      */
     private $role;
 
@@ -27,7 +27,7 @@ class RoleAccessResolver implements AccessResolverInterface
         $this->acl  = $acl;
     }
 
-    public function setRole(RoleInterface $role)
+    public function setRole(AclRoleInterface $role)
     {
         $this->role = $role;
         return $this;

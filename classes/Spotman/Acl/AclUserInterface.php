@@ -1,7 +1,7 @@
 <?php
 namespace Spotman\Acl;
 
-interface UserInterface
+interface AclUserInterface
 {
     /**
      * @return string
@@ -9,7 +9,7 @@ interface UserInterface
     public function getAccessControlIdentity();
 
     /**
-     * @return RoleInterface[]|\Traversable
+     * @return AclRoleInterface[]|\Traversable
      */
     public function getAccessControlRoles();
 }

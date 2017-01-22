@@ -1,7 +1,11 @@
 <?php
 namespace Spotman\Acl;
 
+use Spotman\Acl\ResourcesCollector\ResourcesCollectorInterface;
+use Spotman\Acl\RolesCollector\RolesCollectorInterface;
+use Spotman\Acl\PermissionsCollector\PermissionsCollectorInterface;
 use Spotman\Acl\Resolver\AccessResolverInterface;
+use Spotman\Acl\ResourceFactory\ResourceFactoryInterface;
 
 class Acl
 {
@@ -9,6 +13,16 @@ class Acl
      * @var \Zend\Permissions\Acl\Acl
      */
     private $acl;
+
+    /**
+     * @var ResourcesCollectorInterface[]
+     */
+    private $resourcesCollectors;
+
+    /**
+     * @var RolesCollectorInterface[]
+     */
+    private $rolesCollectors;
 
     /**
      * @var PermissionsCollectorInterface[]
@@ -57,11 +71,26 @@ class Acl
 
         $this->acl = new \Zend\Permissions\Acl\Acl();
 
-        // TODO Collect roles
-        // TODO Collect resources
+        // Collect roles
+        $this->collectRoles();
+
+        // Collect resources
+        $this->collectResources();
 
         // Run permissions collectors
         $this->collectPermissions();
+    }
+
+    public function addRolesCollector(RolesCollectorInterface $collector)
+    {
+        $this->rolesCollectors[] = $collector->setAcl($this);
+        return $this;
+    }
+
+    public function addResourcesCollector(ResourcesCollectorInterface $collector)
+    {
+        $this->resourcesCollectors[] = $collector->setAcl($this);
+        return $this;
     }
 
     public function addPermissionsCollector(PermissionsCollectorInterface $collector)
@@ -76,9 +105,20 @@ class Acl
         return $this;
     }
 
-    public function addRole(RoleInterface $role, $parentRoleIdentity = null)
+    public function resourceFactory($identity)
+    {
+        return $this->resourceFactory->createResource($identity);
+    }
+
+    public function addRole(AclRoleInterface $role, $parentRoleIdentity = null)
     {
         $this->acl->addRole($role, $parentRoleIdentity);
+        return $this;
+    }
+
+    public function removeRole($roleIdentity)
+    {
+        $this->acl->removeRole($roleIdentity);
         return $this;
     }
 
@@ -102,6 +142,22 @@ class Acl
         $this->acl->removeDeny($roleIdentity, $resourceIdentity, $permissionIdentity);
     }
 
+    public function collectRoles()
+    {
+        // Collect all roles
+        foreach ($this->rolesCollectors as $rolesCollector) {
+            $rolesCollector->collectRoles();
+        }
+    }
+
+    public function collectResources()
+    {
+        // Collect all resources
+        foreach ($this->resourcesCollectors as $resourcesCollector) {
+            $resourcesCollector->collectResources();
+        }
+    }
+
     public function collectPermissions()
     {
         // Collect all entities
@@ -114,11 +170,6 @@ class Acl
     {
         $this->resourceFactory = $resourceFactory;
         return $this;
-    }
-
-    public function resourceFactory($identity)
-    {
-        return $this->resourceFactory->createResource($identity);
     }
 
     /**
@@ -144,11 +195,11 @@ class Acl
      *
      * @param \Spotman\Acl\ResourceInterface $resource
      * @param string                         $permissionIdentity
-     * @param \Spotman\Acl\RoleInterface     $role
+     * @param \Spotman\Acl\AclRoleInterface  $role
      *
      * @return bool
      */
-    public function isAllowedToRole(ResourceInterface $resource, $permissionIdentity, RoleInterface $role)
+    public function isAllowedToRole(ResourceInterface $resource, $permissionIdentity, AclRoleInterface $role)
     {
         return $this->acl->isAllowed($role, $resource, $permissionIdentity);
     }
@@ -158,11 +209,11 @@ class Acl
      *
      * @param \Spotman\Acl\ResourceInterface $resource
      * @param string                         $permissionIdentity
-     * @param \Spotman\Acl\UserInterface     $user
+     * @param \Spotman\Acl\AclUserInterface  $user
      *
      * @return bool
      */
-    public function isAllowedToUser(ResourceInterface $resource, $permissionIdentity, UserInterface $user)
+    public function isAllowedToUser(ResourceInterface $resource, $permissionIdentity, AclUserInterface $user)
     {
         $userRoles = $user->getAccessControlRoles();
 
