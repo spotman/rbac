@@ -1,14 +1,20 @@
 <?php
 namespace Spotman\Acl;
 
+use Spotman\Acl\Initializer\InitializerInterface;
 use Spotman\Acl\ResourcesCollector\ResourcesCollectorInterface;
 use Spotman\Acl\RolesCollector\RolesCollectorInterface;
 use Spotman\Acl\PermissionsCollector\PermissionsCollectorInterface;
 use Spotman\Acl\Resolver\AccessResolverInterface;
 use Spotman\Acl\ResourceFactory\ResourceFactoryInterface;
+use Doctrine\Common\Cache\CacheProvider;
 
 class Acl
 {
+    private static $_instance;
+
+    private $initialized = false;
+
     /**
      * @var \Zend\Permissions\Acl\Acl
      */
@@ -39,7 +45,15 @@ class Acl
      */
     private $accessResolver;
 
-    private static $_instance;
+    /**
+     * @var InitializerInterface
+     */
+    private $initializer;
+
+    /**
+     * @var CacheProvider
+     */
+    private $cache;
 
     /**
      * @return Acl
@@ -59,13 +73,25 @@ class Acl
      */
     protected function __construct() {}
 
+    public function setInitializer(InitializerInterface $initializer)
+    {
+        $this->initializer = $initializer;
+        return $this;
+    }
+
     public function init()
     {
-        // TODO Load cached data
-        $cachedData = '';
+        if ($this->initialized)
+            return;
+
+        $this->initializer->init($this);
+
+        // Load cached data
+        $cachedData = $this->getCachedData();
 
         if ($cachedData) {
             $this->restoreFromCacheData($cachedData);
+            $this->initialized = true;
             return;
         }
 
@@ -79,6 +105,23 @@ class Acl
 
         // Run permissions collectors
         $this->collectPermissions();
+
+        $this->putDataInCache();
+
+        $this->initialized = true;
+    }
+
+    protected function checkForInit()
+    {
+        if (!$this->initialized) {
+            $this->init();
+        }
+    }
+
+    public function setCache(CacheProvider $cache)
+    {
+        $this->cache = $cache;
+        $this->cache->setNamespace($this->getCacheNamespace());
     }
 
     public function addRolesCollector(RolesCollectorInterface $collector)
@@ -201,6 +244,9 @@ class Acl
      */
     public function isAllowedToRole(ResourceInterface $resource, $permissionIdentity, AclRoleInterface $role)
     {
+        // Make lazy loading
+        $this->checkForInit();
+
         return $this->acl->isAllowed($role, $resource, $permissionIdentity);
     }
 
@@ -228,6 +274,9 @@ class Acl
 
     public function getAccessResolver()
     {
+        // Make lazy loading
+        $this->checkForInit();
+
         return $this->accessResolver;
     }
 
@@ -240,10 +289,23 @@ class Acl
     /**
      * @return string
      */
-    protected function getCacheData()
+    protected function getCachedData()
     {
+        // Get data from cache
+        return $this->cache && $this->cache->fetch($this->getCacheKey());
+    }
+
+    protected function putDataInCache()
+    {
+        if (!$this->cache) {
+            return false;
+        }
+
         // Serializing Acl instance
-        return serialize($this->acl);
+        $data = serialize($this->acl);
+
+        // Store in cache
+        return $this->cache->save($this->getCacheKey(), $data);
     }
 
     /**
@@ -252,5 +314,15 @@ class Acl
     protected function restoreFromCacheData($data)
     {
         $this->acl = unserialize($data);
+    }
+
+    protected function getCacheNamespace()
+    {
+        return 'acl';
+    }
+
+    protected function getCacheKey()
+    {
+        return 'acl';
     }
 }

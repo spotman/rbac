@@ -14,6 +14,7 @@ use Spotman\Acl\PermissionsCollector\PermissionsCollectorInterface;
 use Spotman\Acl\PermissionsCollector\EmptyPermissionsCollector;
 use Spotman\Acl\ResourceFactory\ResourceFactoryInterface;
 use Spotman\Acl\ResourceFactory\GenericResourceFactory;
+use Doctrine\Common\Cache\ArrayCache;
 
 return [
 
@@ -27,8 +28,11 @@ return [
         // Current user
         AclUserInterface::class                 => DI\get('User'),
 
+        // Cache (using Doctrine`s ArrayCache as default)
+        'AclCache'                              => DI\get(ArrayCache::class),
+
         // Basic initializer for DI containers with autowiring
-        InitializerInterface::class             => DI\get(GenericInitializer::class),
+        InitializerInterface::class             => DI\object(GenericInitializer::class)->lazy(), // Using lazy initializer pattern
 
         // Resolving resources` allowance relatively to current user
         AccessResolverInterface::class          => DI\get(UserAccessResolver::class),

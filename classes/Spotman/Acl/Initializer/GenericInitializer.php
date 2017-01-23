@@ -66,7 +66,5 @@ class GenericInitializer implements InitializerInterface
         $acl->addPermissionsCollector($this->permissionsCollector);
         $acl->setResourceFactory($this->resourceFactory);
         $acl->setAccessResolver($this->accessResolver);
-
-        $acl->init();
     }
 }
