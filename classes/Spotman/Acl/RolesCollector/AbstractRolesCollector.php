@@ -32,9 +32,14 @@ abstract class AbstractRolesCollector implements RolesCollectorInterface
         return $this;
     }
 
-    protected function addRole(AclRoleInterface $role, $parentRoleIdentity = null)
+    protected function hasRole($roleIdentity)
     {
-        $this->acl->addRole($role, $parentRoleIdentity);
+        return $this->acl->hasRole($roleIdentity);
+    }
+
+    protected function addRole($roleIdentity, $parentRolesIdentities = null)
+    {
+        $this->acl->addRole($roleIdentity, $parentRolesIdentities);
     }
 
     protected function removeRole($roleIdentity)

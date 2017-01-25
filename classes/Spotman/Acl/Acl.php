@@ -153,9 +153,9 @@ class Acl
         return $this->resourceFactory->createResource($identity);
     }
 
-    public function addRole(AclRoleInterface $role, $parentRoleIdentity = null)
+    public function addRole($roleIdentity, $parentRolesIdentities = null)
     {
-        $this->acl->addRole($role, $parentRoleIdentity);
+        $this->acl->addRole($roleIdentity, $parentRolesIdentities);
         return $this;
     }
 
@@ -163,6 +163,11 @@ class Acl
     {
         $this->acl->removeRole($roleIdentity);
         return $this;
+    }
+
+    public function hasRole($roleIdentity)
+    {
+        return $this->acl->hasRole($roleIdentity);
     }
 
     public function addAllowRule($roleIdentity = null, $resourceIdentity = null, $permissionIdentity = null, $bindToResourceIdentity = null)
