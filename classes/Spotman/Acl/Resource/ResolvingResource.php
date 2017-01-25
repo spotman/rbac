@@ -20,13 +20,17 @@ abstract class ResolvingResource extends AbstractResource implements ResolvingRe
 
     protected function isAllowed($permissionIdentity)
     {
-        // Get default Acl resolver if none provided
+        return $this->getResolver()->isAllowed($this, $permissionIdentity);
+    }
+
+    protected function getResolver()
+    {
         $resolver = $this->resolver ?: Acl::instance()->getAccessResolver();
 
         if (!$resolver) {
             throw new Exception('Resolver is not defined for resource :name', [':name' => $this->getResourceId()]);
         }
 
-        return $resolver->isAllowed($this, $permissionIdentity);
+        return $resolver;
     }
 }

@@ -31,23 +31,23 @@ abstract class AbstractPermissionsCollector implements PermissionsCollectorInter
         return $this;
     }
 
-    protected function addAllowRule($roleIdentity, $resourceIdentity, $permissionIdentity)
+    protected function addAllowRule($roleIdentity, $resourceIdentity, $permissionIdentity, $bindToResourceIdentity = null)
     {
-        $this->acl->addAllowRule($roleIdentity, $resourceIdentity, $permissionIdentity);
+        $this->acl->addAllowRule($roleIdentity, $resourceIdentity, $permissionIdentity, $bindToResourceIdentity);
     }
 
-    protected function removeAllowRule($roleIdentity, $resourceIdentity, $permissionIdentity)
+    protected function removeAllowRule($roleIdentity, $resourceIdentity, $permissionIdentity, $bindToResourceIdentity = null)
     {
-        $this->acl->removeAllowRule($roleIdentity, $resourceIdentity, $permissionIdentity);
+        $this->acl->removeAllowRule($roleIdentity, $resourceIdentity, $permissionIdentity, $bindToResourceIdentity);
     }
 
-    protected function addDenyRule($roleIdentity, $resourceIdentity, $permissionIdentity)
+    protected function addDenyRule($roleIdentity, $resourceIdentity, $permissionIdentity, $bindToResourceIdentity = null)
     {
-        $this->acl->addDenyRule($roleIdentity, $resourceIdentity, $permissionIdentity);
+        $this->acl->addDenyRule($roleIdentity, $resourceIdentity, $permissionIdentity, $bindToResourceIdentity);
     }
 
-    protected function removeDenyRule($roleIdentity, $resourceIdentity, $permissionIdentity)
+    protected function removeDenyRule($roleIdentity, $resourceIdentity, $permissionIdentity, $bindToResourceIdentity = null)
     {
-        $this->acl->removeDenyRule($roleIdentity, $resourceIdentity, $permissionIdentity);
+        $this->acl->removeDenyRule($roleIdentity, $resourceIdentity, $permissionIdentity, $bindToResourceIdentity);
     }
 }

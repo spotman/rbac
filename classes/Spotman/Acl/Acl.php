@@ -165,24 +165,48 @@ class Acl
         return $this;
     }
 
-    public function addAllowRule($roleIdentity = null, $resourceIdentity = null, $permissionIdentity = null)
+    public function addAllowRule($roleIdentity = null, $resourceIdentity = null, $permissionIdentity = null, $bindToResourceIdentity = null)
     {
-        $this->acl->allow($roleIdentity, $resourceIdentity, $permissionIdentity);
+        if (!$bindToResourceIdentity) {
+            $bindToResourceIdentity = $resourceIdentity;
+        }
+
+        $permissionIdentity = $this->makeCompoundPermissionIdentity($resourceIdentity, $permissionIdentity);
+
+        $this->acl->allow($roleIdentity, $bindToResourceIdentity, $permissionIdentity);
     }
 
-    public function removeAllowRule($roleIdentity = null, $resourceIdentity = null, $permissionIdentity = null)
+    public function removeAllowRule($roleIdentity = null, $resourceIdentity = null, $permissionIdentity = null, $bindToResourceIdentity = null)
     {
-        $this->acl->removeAllow($roleIdentity, $resourceIdentity, $permissionIdentity);
+        if (!$bindToResourceIdentity) {
+            $bindToResourceIdentity = $resourceIdentity;
+        }
+
+        $permissionIdentity = $this->makeCompoundPermissionIdentity($resourceIdentity, $permissionIdentity);
+
+        $this->acl->removeAllow($roleIdentity, $bindToResourceIdentity, $permissionIdentity);
     }
 
-    public function addDenyRule($roleIdentity = null, $resourceIdentity = null, $permissionIdentity = null)
+    public function addDenyRule($roleIdentity = null, $resourceIdentity = null, $permissionIdentity = null, $bindToResourceIdentity = null)
     {
-        $this->acl->deny($roleIdentity, $resourceIdentity, $permissionIdentity);
+        if (!$bindToResourceIdentity) {
+            $bindToResourceIdentity = $resourceIdentity;
+        }
+
+        $permissionIdentity = $this->makeCompoundPermissionIdentity($resourceIdentity, $permissionIdentity);
+
+        $this->acl->deny($roleIdentity, $bindToResourceIdentity, $permissionIdentity);
     }
 
-    public function removeDenyRule($roleIdentity = null, $resourceIdentity = null, $permissionIdentity = null)
+    public function removeDenyRule($roleIdentity = null, $resourceIdentity = null, $permissionIdentity = null, $bindToResourceIdentity = null)
     {
-        $this->acl->removeDeny($roleIdentity, $resourceIdentity, $permissionIdentity);
+        if (!$bindToResourceIdentity) {
+            $bindToResourceIdentity = $resourceIdentity;
+        }
+
+        $permissionIdentity = $this->makeCompoundPermissionIdentity($resourceIdentity, $permissionIdentity);
+
+        $this->acl->removeDeny($roleIdentity, $bindToResourceIdentity, $permissionIdentity);
     }
 
     public function collectRoles()
@@ -247,6 +271,8 @@ class Acl
         // Make lazy loading
         $this->checkForInit();
 
+        $permissionIdentity = $this->makeCompoundPermissionIdentity($resource->getResourceId(), $permissionIdentity);
+
         return $this->acl->isAllowed($role, $resource, $permissionIdentity);
     }
 
@@ -270,6 +296,15 @@ class Acl
         }
 
         return false;
+    }
+
+    protected function makeCompoundPermissionIdentity($resourceIdentity = null,  $permissionIdentity = null)
+    {
+        if ($permissionIdentity === null || $resourceIdentity === null) {
+            return $permissionIdentity;
+        } else {
+            return $resourceIdentity.'.'.$permissionIdentity;
+        }
     }
 
     public function getAccessResolver()
