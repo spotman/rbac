@@ -25,7 +25,7 @@ abstract class ResolvingResource extends AbstractResource implements ResolvingRe
 
     protected function getResolver()
     {
-        $resolver = $this->resolver ?: Acl::instance()->getAccessResolver();
+        $resolver = $this->resolver ?: Acl::getInstance()->getAccessResolver();
 
         if (!$resolver) {
             throw new Exception('Resolver is not defined for resource :name', [':name' => $this->getResourceId()]);

@@ -58,7 +58,7 @@ class Acl
     /**
      * @return Acl
      */
-    public static function instance()
+    public static function getInstance()
     {
         if (!static::$_instance) {
             static::$_instance = new static;
@@ -303,6 +303,12 @@ class Acl
         return false;
     }
 
+    /**
+     * @param string|null $resourceIdentity
+     * @param string|null $permissionIdentity
+     *
+     * @return null|string
+     */
     protected function makeCompoundPermissionIdentity($resourceIdentity = null,  $permissionIdentity = null)
     {
         if ($permissionIdentity === null || $resourceIdentity === null) {

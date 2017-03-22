@@ -22,7 +22,7 @@ return [
 
         // Acl facade
         Acl::class => DI\factory(function() {
-            return Acl::instance();
+            return Acl::getInstance();
         })->scope(\DI\Scope::SINGLETON),
 
         // Current user
