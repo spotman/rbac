@@ -359,7 +359,15 @@ class Acl
      */
     protected function restoreFromCacheData($data)
     {
+        if (!is_string($data)) {
+            throw new Exception('Cached data is not a string, :type given', [':type' => gettype($data)]);
+        }
+
         $this->acl = unserialize($data);
+
+        if (!($this->acl && $this->acl instanceof Acl)) {
+            throw new Exception('Cached data is not an Acl instance, :type given', [':type' => gettype($this->acl)]);
+        }
     }
 
     protected function getCacheNamespace()
