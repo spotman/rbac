@@ -3,6 +3,7 @@ namespace Spotman\Acl\Initializer;
 
 use Psr\Log\LoggerInterface;
 use Spotman\Acl\Acl;
+use Spotman\Acl\AclUserInterface;
 use Spotman\Acl\Resolver\AccessResolverInterface;
 use Spotman\Acl\RolesCollector\RolesCollectorInterface;
 use Spotman\Acl\ResourcesCollector\ResourcesCollectorInterface;
@@ -37,6 +38,11 @@ class GenericInitializer implements InitializerInterface
     private $accessResolver;
 
     /**
+     * @var AclUserInterface
+     */
+    private $user;
+
+    /**
      * @var \Psr\Log\LoggerInterface
      */
     private $logger;
@@ -50,6 +56,7 @@ class GenericInitializer implements InitializerInterface
      * @param \Spotman\Acl\ResourcesCollector\ResourcesCollectorInterface     $resourcesCollector
      * @param \Spotman\Acl\PermissionsCollector\PermissionsCollectorInterface $permissionsCollector
      * @param LoggerInterface                                                 $logger
+     * @param AclUserInterface                                                $user
      */
     public function __construct(
         ResourceFactoryInterface $resourceFactory,
@@ -57,10 +64,12 @@ class GenericInitializer implements InitializerInterface
         RolesCollectorInterface $rolesCollector,
         ResourcesCollectorInterface $resourcesCollector,
         PermissionsCollectorInterface $permissionsCollector,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        AclUserInterface $user
     )
     {
         $this->logger                   = $logger;
+        $this->user                     = $user;
         $this->resourceFactory          = $resourceFactory;
         $this->accessResolver           = $accessResolver;
         $this->rolesCollector           = $rolesCollector;

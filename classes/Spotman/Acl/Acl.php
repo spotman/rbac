@@ -54,6 +54,11 @@ class Acl implements LoggerAwareInterface
     private $accessResolver;
 
     /**
+     * @var \Spotman\Acl\AclUserInterface
+     */
+    private $currentUser;
+
+    /**
      * @var InitializerInterface
      */
     private $initializer;
@@ -399,7 +404,9 @@ class Acl implements LoggerAwareInterface
 
     protected function getCacheKey()
     {
-        // TODO Unique key for each user
-        return 'acl';
+        $userIdentity = $this->currentUser->getAccessControlIdentity() ?: 'guest';
+
+        // Unique key for each user (more space usage but less collision)
+        return 'acl-user-'.$userIdentity;
     }
 }
