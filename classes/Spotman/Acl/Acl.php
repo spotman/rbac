@@ -99,6 +99,11 @@ class Acl implements LoggerAwareInterface
         $this->logger = $logger;
     }
 
+    public function setCurrentUser(AclUserInterface $user)
+    {
+        $this->currentUser = $user;
+    }
+
     public function setInitializer(InitializerInterface $initializer)
     {
         $this->initializer = $initializer;

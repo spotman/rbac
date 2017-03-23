@@ -56,7 +56,7 @@ class GenericInitializer implements InitializerInterface
      * @param \Spotman\Acl\ResourcesCollector\ResourcesCollectorInterface     $resourcesCollector
      * @param \Spotman\Acl\PermissionsCollector\PermissionsCollectorInterface $permissionsCollector
      * @param LoggerInterface                                                 $logger
-     * @param AclUserInterface                                                $user
+     * @param AclUserInterface $user
      */
     public function __construct(
         ResourceFactoryInterface $resourceFactory,
@@ -80,6 +80,7 @@ class GenericInitializer implements InitializerInterface
     public function init(Acl $acl)
     {
         $acl->setLogger($this->logger);
+        $acl->setCurrentUser($this->user);
         $acl->addRolesCollector($this->rolesCollector);
         $acl->addResourcesCollector($this->resourcesCollector);
         $acl->addPermissionsCollector($this->permissionsCollector);
