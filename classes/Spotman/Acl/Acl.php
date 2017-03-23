@@ -1,6 +1,9 @@
 <?php
 namespace Spotman\Acl;
 
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
+use Psr\Log\LoggerInterface;
 use Spotman\Acl\Initializer\InitializerInterface;
 use Spotman\Acl\ResourcesCollector\ResourcesCollectorInterface;
 use Spotman\Acl\RolesCollector\RolesCollectorInterface;
@@ -9,11 +12,16 @@ use Spotman\Acl\Resolver\AccessResolverInterface;
 use Spotman\Acl\ResourceFactory\ResourceFactoryInterface;
 use Doctrine\Common\Cache\CacheProvider;
 
-class Acl
+class Acl implements LoggerAwareInterface
 {
     private static $_instance;
 
     private $initialized = false;
+
+    /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    private $logger;
 
     /**
      * @var \Zend\Permissions\Acl\Acl
@@ -66,12 +74,25 @@ class Acl
 
         return static::$_instance;
     }
+
     /**
      * Acl constructor.
      * Prevent direct call via *new*
      * Use Acl::instance() instead
      */
     protected function __construct() {}
+
+    /**
+     * Sets a logger instance on the object.
+     *
+     * @param LoggerInterface $logger
+     *
+     * @return void
+     */
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+    }
 
     public function setInitializer(InitializerInterface $initializer)
     {
@@ -90,6 +111,7 @@ class Acl
         $cachedData = $this->getCachedData();
 
         if ($cachedData) {
+            $this->logger && $this->logger->debug('Loading Acl from cached data');
             $this->restoreFromCacheData($cachedData);
             $this->initialized = true;
             return;
@@ -333,7 +355,7 @@ class Acl
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     protected function getCachedData()
     {
