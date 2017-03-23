@@ -365,7 +365,7 @@ class Acl
 
         $this->acl = unserialize($data);
 
-        if (!($this->acl && $this->acl instanceof Acl)) {
+        if (!($this->acl && $this->acl instanceof \Zend\Permissions\Acl\Acl)) {
             throw new Exception('Cached data is not an Acl instance, :type given', [':type' => gettype($this->acl)]);
         }
     }
@@ -377,6 +377,7 @@ class Acl
 
     protected function getCacheKey()
     {
+        // TODO Unique key for each user
         return 'acl';
     }
 }
