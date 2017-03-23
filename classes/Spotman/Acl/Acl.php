@@ -338,7 +338,7 @@ class Acl
     protected function getCachedData()
     {
         // Get data from cache
-        return $this->cache && $this->cache->fetch($this->getCacheKey());
+        return $this->cache ? $this->cache->fetch($this->getCacheKey()) : null;
     }
 
     protected function putDataInCache()
