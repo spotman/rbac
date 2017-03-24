@@ -6,14 +6,11 @@ use Spotman\Acl\Acl;
 interface RolesCollectorInterface
 {
     /**
-     * Collect roles from external source and add them to acl via protected methods addRole / removeRole
-     */
-    public function collectRoles();
-
-    /**
+     * Collect roles from external source and add them to acl via public methods addRole / removeRole
+     *
      * @param \Spotman\Acl\Acl $acl
      *
-     * @return $this
+     * @return
      */
-    public function setAcl(Acl $acl);
+    public function collectRoles(Acl $acl);
 }

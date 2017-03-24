@@ -22,19 +22,19 @@ return [
 
         // Acl facade
         Acl::class => DI\factory(function() {
-            return Acl::getInstance();
+            return \Spotman\Acl\AclFactory::getInstance()->createAcl();
         })->scope(\DI\Scope::SINGLETON),
 
         // Current user
         AclUserInterface::class                 => DI\get('User'),
 
         // Cache (using Doctrine`s ArrayCache as default)
-        'AclCache'                              => DI\get(ArrayCache::class),
+        Acl::DI_CACHE_OBJECT_KEY                => DI\get(ArrayCache::class),
 
         // Basic initializer for DI containers with autowiring
         InitializerInterface::class             => DI\object(GenericInitializer::class)->lazy(), // Using lazy initializer pattern
 
-        // Resolving resources` allowance relatively to current user
+        // Resolving resources` access relatively to current user
         AccessResolverInterface::class          => DI\get(UserAccessResolver::class),
 
         // No roles by default

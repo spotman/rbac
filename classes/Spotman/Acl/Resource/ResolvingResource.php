@@ -1,8 +1,6 @@
 <?php
 namespace Spotman\Acl\Resource;
 
-use Spotman\Acl\Acl;
-use Spotman\Acl\Exception;
 use Spotman\Acl\Resolver\AccessResolverInterface;
 
 abstract class ResolvingResource extends AbstractResource implements ResolvingResourceInterface
@@ -12,25 +10,32 @@ abstract class ResolvingResource extends AbstractResource implements ResolvingRe
      */
     private $resolver;
 
-    public function useResolver(AccessResolverInterface $resolver)
+    /**
+     * ResolvingResource constructor.
+     *
+     * @param \Spotman\Acl\Resolver\AccessResolverInterface $resolver
+     */
+    public function __construct(AccessResolverInterface $resolver)
     {
         $this->resolver = $resolver;
-        return $this;
+        parent::__construct();
     }
 
+    /**
+     * @return \Spotman\Acl\Resolver\AccessResolverInterface
+     */
+    public function getResolver()
+    {
+        return $this->resolver;
+    }
+
+    /**
+     * @param string $permissionIdentity
+     *
+     * @return bool
+     */
     protected function isAllowed($permissionIdentity)
     {
-        return $this->getResolver()->isAllowed($this, $permissionIdentity);
-    }
-
-    protected function getResolver()
-    {
-        $resolver = $this->resolver ?: Acl::getInstance()->getAccessResolver();
-
-        if (!$resolver) {
-            throw new Exception('Resolver is not defined for resource :name', [':name' => $this->getResourceId()]);
-        }
-
-        return $resolver;
+        return $this->resolver->isAllowed($this, $permissionIdentity);
     }
 }

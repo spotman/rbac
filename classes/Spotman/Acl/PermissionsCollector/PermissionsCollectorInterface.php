@@ -7,13 +7,10 @@ interface PermissionsCollectorInterface
 {
     /**
      * Collect entities from external source and add them to acl via protected methods addAllowRule / addDenyRule
-     */
-    public function collectPermissions();
-
-    /**
+     *
      * @param \Spotman\Acl\Acl $acl
      *
-     * @return $this
+     * @return
      */
-    public function setAcl(Acl $acl);
+    public function collectPermissions(Acl $acl);
 }

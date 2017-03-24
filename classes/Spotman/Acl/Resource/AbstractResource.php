@@ -1,6 +1,7 @@
 <?php
 namespace Spotman\Acl\Resource;
 
+use Spotman\Acl\Exception;
 use Spotman\Acl\ResourceInterface;
 
 abstract class AbstractResource implements ResourceInterface
@@ -50,20 +51,14 @@ abstract class AbstractResource implements ResourceInterface
      */
     abstract public function getAvailablePermissionsIdentities();
 
-    /**
-     * serialize() checks if your class has a function with the magic name __sleep.
-     * If so, that function is executed prior to any serialization.
-     * It can clean up the object and is supposed to return an array with the names of all variables of that object that should be serialized.
-     * If the method doesn't return anything then NULL is serialized and E_NOTICE is issued.
-     * The intended use of __sleep is to commit pending data or perform similar cleanup tasks.
-     * Also, the function is useful if you have very large objects which do not need to be saved completely.
-     *
-     * @return array|NULL
-     * @link http://php.net/manual/en/language.oop5.magic.php#language.oop5.magic.sleep
-     */
-    function __sleep()
+    public function __sleep()
     {
         // Do not serialize any data - this class must be stateless
         return [];
+    }
+
+    public function __wakeup()
+    {
+        throw new Exception('This class can not be serialized, consider using DI and helper classes');
     }
 }

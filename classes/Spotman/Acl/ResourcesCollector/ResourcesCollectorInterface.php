@@ -6,14 +6,11 @@ use Spotman\Acl\Acl;
 interface ResourcesCollectorInterface
 {
     /**
-     * Collect resources from external source and add them to acl via protected methods addResource
-     */
-    public function collectResources();
-
-    /**
+     * Collect resources from external source and add them to acl via public method Acl::addResource
+     *
      * @param \Spotman\Acl\Acl $acl
      *
-     * @return $this
+     * @return
      */
-    public function setAcl(Acl $acl);
+    public function collectResources(Acl $acl);
 }

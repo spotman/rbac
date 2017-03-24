@@ -2,19 +2,17 @@
 namespace Spotman\Acl;
 
 use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Spotman\Acl\Initializer\InitializerInterface;
 use Spotman\Acl\ResourcesCollector\ResourcesCollectorInterface;
 use Spotman\Acl\RolesCollector\RolesCollectorInterface;
 use Spotman\Acl\PermissionsCollector\PermissionsCollectorInterface;
-use Spotman\Acl\Resolver\AccessResolverInterface;
 use Spotman\Acl\ResourceFactory\ResourceFactoryInterface;
 use Doctrine\Common\Cache\CacheProvider;
 
 class Acl implements LoggerAwareInterface
 {
-    private static $_instance;
+    const DI_CACHE_OBJECT_KEY = 'AclCache';
 
     private $initialized = false;
 
@@ -29,19 +27,19 @@ class Acl implements LoggerAwareInterface
     private $acl;
 
     /**
-     * @var ResourcesCollectorInterface[]
+     * @var ResourcesCollectorInterface
      */
-    private $resourcesCollectors;
+    private $resourcesCollector;
 
     /**
-     * @var RolesCollectorInterface[]
+     * @var RolesCollectorInterface
      */
-    private $rolesCollectors;
+    private $rolesCollector;
 
     /**
-     * @var PermissionsCollectorInterface[]
+     * @var PermissionsCollectorInterface
      */
-    private $permissionsCollectors;
+    private $permissionsCollector;
 
     /**
      * @var ResourceFactoryInterface
@@ -49,43 +47,28 @@ class Acl implements LoggerAwareInterface
     private $resourceFactory;
 
     /**
-     * @var AccessResolverInterface
-     */
-    private $accessResolver;
-
-    /**
      * @var \Spotman\Acl\AclUserInterface
      */
     private $currentUser;
-
-    /**
-     * @var InitializerInterface
-     */
-    private $initializer;
 
     /**
      * @var CacheProvider
      */
     private $cache;
 
-    /**
-     * @return Acl
-     */
-    public static function getInstance()
+    public function __construct(InitializerInterface $initializer, AclUserInterface $user, CacheProvider $cache)
     {
-        if (!static::$_instance) {
-            static::$_instance = new static;
-        }
+        // Fetch objects from initializer
+        $this->rolesCollector       = $initializer->getRolesCollector();
+        $this->resourceFactory      = $initializer->getResourceFactory();
+        $this->resourcesCollector   = $initializer->getResourcesCollector();
+        $this->permissionsCollector = $initializer->getPermissionsCollector();
 
-        return static::$_instance;
+        $this->currentUser  = $user;
+        $this->cache        = $cache;
+
+        $this->cache->setNamespace($this->getCacheNamespace());
     }
-
-    /**
-     * Acl constructor.
-     * Prevent direct call via *new*
-     * Use Acl::instance() instead
-     */
-    protected function __construct() {}
 
     /**
      * Sets a logger instance on the object.
@@ -99,90 +82,69 @@ class Acl implements LoggerAwareInterface
         $this->logger = $logger;
     }
 
-    public function setCurrentUser(AclUserInterface $user)
+    /**
+     * Must be called in factory after object creation coz there is circular dependencies Acl::init() => collect resources => AccessResolverInterface => Acl => Acl::init
+     */
+    private function init()
     {
-        $this->currentUser = $user;
-    }
-
-    public function setInitializer(InitializerInterface $initializer)
-    {
-        $this->initializer = $initializer;
-        return $this;
-    }
-
-    public function init()
-    {
-        if ($this->initialized)
-            return;
-
-        $this->initializer->init($this);
-
-        // Load cached data
-        $cachedData = $this->getCachedData();
-
-        if ($cachedData) {
-            $this->logger && $this->logger->debug('Loading Acl from cached data');
-            $this->restoreFromCacheData($cachedData);
-            $this->initialized = true;
+        if ($this->initialized) {
             return;
         }
 
+        // Try to load cached data first
+        if ($cachedData = $this->getCachedData()) {
+            $this->logger && $this->logger->debug('Loading Acl from cached data');
+            $this->restoreFromCacheData($cachedData);
+            return;
+        }
+
+        // Normal initialization if no cache data provided
         $this->acl = new \Zend\Permissions\Acl\Acl();
 
         // Collect roles
-        $this->collectRoles();
+        $this->rolesCollector->collectRoles($this);
 
         // Collect resources
-        $this->collectResources();
+        $this->resourcesCollector->collectResources($this);
 
-        // Run permissions collectors
-        $this->collectPermissions();
+        // Collect permissions
+        $this->permissionsCollector->collectPermissions($this);
 
         $this->putDataInCache();
 
         $this->initialized = true;
     }
 
-    protected function checkForInit()
+    protected function getZendAcl()
     {
-        if (!$this->initialized) {
-            $this->init();
+        // Make lazy initialization
+        $this->init();
+
+        return $this->acl;
+    }
+
+    /**
+     * @return \Spotman\Acl\AclUserInterface
+     */
+    public function getCurrentUser()
+    {
+        return $this->currentUser;
+    }
+
+    /**
+     * @param \Spotman\Acl\ResourceInterface|string      $resource
+     * @param \Spotman\Acl\ResourceInterface|string|null $parentResource
+     *
+     * @return $this
+     */
+    public function addResource($resource, $parentResource = null)
+    {
+        if (!($resource instanceof ResourceInterface)) {
+            $resource = $this->resourceFactory->createResource($resource);
         }
-    }
 
-    public function setCache(CacheProvider $cache)
-    {
-        $this->cache = $cache;
-        $this->cache->setNamespace($this->getCacheNamespace());
-    }
-
-    public function addRolesCollector(RolesCollectorInterface $collector)
-    {
-        $this->rolesCollectors[] = $collector->setAcl($this);
+        $this->acl->addResource($resource, $parentResource);
         return $this;
-    }
-
-    public function addResourcesCollector(ResourcesCollectorInterface $collector)
-    {
-        $this->resourcesCollectors[] = $collector->setAcl($this);
-        return $this;
-    }
-
-    public function addPermissionsCollector(PermissionsCollectorInterface $collector)
-    {
-        $this->permissionsCollectors[] = $collector->setAcl($this);
-        return $this;
-    }
-
-    public function addResource(ResourceInterface $resource, $parentResourceIdentity = null)
-    {
-        $this->acl->addResource($resource, $parentResourceIdentity);
-        return $this;
-    }
-
-    public function resourceFactory($identity)
-    {
-        return $this->resourceFactory->createResource($identity);
     }
 
     public function addRole($roleIdentity, $parentRolesIdentities = null)
@@ -246,54 +208,6 @@ class Acl implements LoggerAwareInterface
         $this->acl->removeDeny($roleIdentity, $bindToResourceIdentity, $permissionIdentity);
     }
 
-    public function collectRoles()
-    {
-        // Collect all roles
-        foreach ($this->rolesCollectors as $rolesCollector) {
-            $rolesCollector->collectRoles();
-        }
-    }
-
-    public function collectResources()
-    {
-        // Collect all resources
-        foreach ($this->resourcesCollectors as $resourcesCollector) {
-            $resourcesCollector->collectResources();
-        }
-    }
-
-    public function collectPermissions()
-    {
-        // Collect all entities
-        foreach ($this->permissionsCollectors as $permissionCollector) {
-            $permissionCollector->collectPermissions();
-        }
-    }
-
-    public function setResourceFactory(ResourceFactoryInterface $resourceFactory)
-    {
-        $this->resourceFactory = $resourceFactory;
-        return $this;
-    }
-
-    /**
-     * @return string[]
-     */
-    public function getResourcesIdentities()
-    {
-        return $this->acl->getResources();
-    }
-
-    /**
-     * @param $identity
-     *
-     * @return ResourceInterface|\Zend\Permissions\Acl\Resource\ResourceInterface
-     */
-    public function getResource($identity)
-    {
-        return $this->acl->getResource($identity);
-    }
-
     /**
      * Check for raw permission name
      *
@@ -305,8 +219,7 @@ class Acl implements LoggerAwareInterface
      */
     public function isAllowedToRole(ResourceInterface $resource, $permissionIdentity, AclRoleInterface $role)
     {
-        // Make lazy loading
-        $this->checkForInit();
+        $this->init();
 
         $permissionIdentity = $this->makeCompoundPermissionIdentity($resource->getResourceId(), $permissionIdentity);
 
@@ -345,23 +258,9 @@ class Acl implements LoggerAwareInterface
     {
         if ($permissionIdentity === null || $resourceIdentity === null) {
             return $permissionIdentity;
-        } else {
-            return $resourceIdentity.'.'.$permissionIdentity;
         }
-    }
 
-    public function getAccessResolver()
-    {
-        // Make lazy loading
-        $this->checkForInit();
-
-        return $this->accessResolver;
-    }
-
-    public function setAccessResolver(AccessResolverInterface $resolver)
-    {
-        $this->accessResolver = $resolver;
-        return $this;
+        return $resourceIdentity.'.'.$permissionIdentity;
     }
 
     /**

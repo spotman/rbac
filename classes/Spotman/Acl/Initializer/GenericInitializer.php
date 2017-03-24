@@ -1,9 +1,6 @@
 <?php
 namespace Spotman\Acl\Initializer;
 
-use Psr\Log\LoggerInterface;
-use Spotman\Acl\Acl;
-use Spotman\Acl\AclUserInterface;
 use Spotman\Acl\Resolver\AccessResolverInterface;
 use Spotman\Acl\RolesCollector\RolesCollectorInterface;
 use Spotman\Acl\ResourcesCollector\ResourcesCollectorInterface;
@@ -33,58 +30,55 @@ class GenericInitializer implements InitializerInterface
     private $resourceFactory;
 
     /**
-     * @var AccessResolverInterface
-     */
-    private $accessResolver;
-
-    /**
-     * @var AclUserInterface
-     */
-    private $user;
-
-    /**
-     * @var \Psr\Log\LoggerInterface
-     */
-    private $logger;
-
-    /**
      * GenericInitializer constructor.
      *
      * @param \Spotman\Acl\ResourceFactory\ResourceFactoryInterface           $resourceFactory
-     * @param \Spotman\Acl\Resolver\AccessResolverInterface                   $accessResolver
      * @param \Spotman\Acl\RolesCollector\RolesCollectorInterface             $rolesCollector
      * @param \Spotman\Acl\ResourcesCollector\ResourcesCollectorInterface     $resourcesCollector
      * @param \Spotman\Acl\PermissionsCollector\PermissionsCollectorInterface $permissionsCollector
-     * @param LoggerInterface                                                 $logger
-     * @param AclUserInterface $user
      */
     public function __construct(
         ResourceFactoryInterface $resourceFactory,
-        AccessResolverInterface $accessResolver,
         RolesCollectorInterface $rolesCollector,
         ResourcesCollectorInterface $resourcesCollector,
-        PermissionsCollectorInterface $permissionsCollector,
-        LoggerInterface $logger,
-        AclUserInterface $user
+        PermissionsCollectorInterface $permissionsCollector
     )
     {
-        $this->logger                   = $logger;
-        $this->user                     = $user;
         $this->resourceFactory          = $resourceFactory;
-        $this->accessResolver           = $accessResolver;
         $this->rolesCollector           = $rolesCollector;
         $this->resourcesCollector       = $resourcesCollector;
         $this->permissionsCollector     = $permissionsCollector;
     }
 
-    public function init(Acl $acl)
+    /**
+     * @return \Spotman\Acl\RolesCollector\RolesCollectorInterface
+     */
+    public function getRolesCollector()
     {
-        $acl->setLogger($this->logger);
-        $acl->setCurrentUser($this->user);
-        $acl->addRolesCollector($this->rolesCollector);
-        $acl->addResourcesCollector($this->resourcesCollector);
-        $acl->addPermissionsCollector($this->permissionsCollector);
-        $acl->setResourceFactory($this->resourceFactory);
-        $acl->setAccessResolver($this->accessResolver);
+        return $this->rolesCollector;
+    }
+
+    /**
+     * @return \Spotman\Acl\ResourcesCollector\ResourcesCollectorInterface
+     */
+    public function getResourcesCollector()
+    {
+        return $this->resourcesCollector;
+    }
+
+    /**
+     * @return \Spotman\Acl\PermissionsCollector\PermissionsCollectorInterface
+     */
+    public function getPermissionsCollector()
+    {
+        return $this->permissionsCollector;
+    }
+
+    /**
+     * @return \Spotman\Acl\ResourceFactory\ResourceFactoryInterface
+     */
+    public function getResourceFactory()
+    {
+        return $this->resourceFactory;
     }
 }
