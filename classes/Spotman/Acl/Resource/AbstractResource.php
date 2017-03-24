@@ -1,7 +1,6 @@
 <?php
 namespace Spotman\Acl\Resource;
 
-use Spotman\Acl\Exception;
 use Spotman\Acl\ResourceInterface;
 
 abstract class AbstractResource implements ResourceInterface
@@ -55,10 +54,5 @@ abstract class AbstractResource implements ResourceInterface
     {
         // Do not serialize any data - this class must be stateless
         return [];
-    }
-
-    public function __wakeup()
-    {
-        throw new Exception('This class can not be serialized, consider using DI and helper classes');
     }
 }

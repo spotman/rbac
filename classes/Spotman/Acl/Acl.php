@@ -4,6 +4,7 @@ namespace Spotman\Acl;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Spotman\Acl\Initializer\InitializerInterface;
+use Spotman\Acl\Resource\ResolvingResourceInterface;
 use Spotman\Acl\ResourcesCollector\ResourcesCollectorInterface;
 use Spotman\Acl\RolesCollector\RolesCollectorInterface;
 use Spotman\Acl\PermissionsCollector\PermissionsCollectorInterface;
@@ -298,6 +299,17 @@ class Acl implements LoggerAwareInterface
 
         if (!($this->acl && $this->acl instanceof \Zend\Permissions\Acl\Acl)) {
             throw new Exception('Cached data is not an Acl instance, :type given', [':type' => gettype($this->acl)]);
+        }
+
+        // Restore dependencies inside of resources
+        foreach ($this->acl->getResources() as $key) {
+            /** @var \Spotman\Acl\ResourceInterface $resource */
+            $resource = $this->acl->getResource($key);
+
+            // Restore Acl dependency inside of AccessResolver
+            if ($resource instanceof ResolvingResourceInterface) {
+                $resource->getResolver()->setAcl($this);
+            }
         }
     }
 
