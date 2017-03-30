@@ -1,12 +1,15 @@
 <?php
 namespace Spotman\Acl\Resource;
 
+use Spotman\Acl\Resolver\AccessResolverInterface;
 use Spotman\Acl\ResourceInterface;
 
 interface ResolvingResourceInterface extends ResourceInterface
 {
     /**
-     * @return \Spotman\Acl\Resolver\AccessResolverInterface
+     * @param \Spotman\Acl\Resolver\AccessResolverInterface $resolver
+     *
+     * @return $this
      */
-    public function getResolver();
+    public function useResolver(AccessResolverInterface $resolver);
 }

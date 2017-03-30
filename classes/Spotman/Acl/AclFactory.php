@@ -30,9 +30,6 @@ class AclFactory
             return $acl;
         }, $params);
 
-        // Make external initialization coz of circular dependency Acl::init() => collect resources => AccessResolverInterface => Acl => Acl::init
-//        $acl->init();
-
         return $acl;
     }
 }

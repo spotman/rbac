@@ -1,7 +1,7 @@
 <?php
 namespace Spotman\Acl\Resource;
 
-abstract class CrudPermissionsResource extends MultiplePermissionsResource
+abstract class CrudPermissionsResource extends ResolvingResource
 {
     const PERMISSION_CREATE = 'create';
     const PERMISSION_READ   = 'read';
@@ -11,7 +11,7 @@ abstract class CrudPermissionsResource extends MultiplePermissionsResource
     /**
      * @return string[]
      */
-    public function getAvailablePermissionsIdentities()
+    final public function getAvailablePermissionIdentities()
     {
         return [
             self::PERMISSION_CREATE,

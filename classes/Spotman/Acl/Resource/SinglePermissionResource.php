@@ -15,7 +15,7 @@ abstract class SinglePermissionResource extends ResolvingResource
      *
      * @return string[]
      */
-    public function getAvailablePermissionsIdentities()
+    final public function getAvailablePermissionIdentities()
     {
         return [
             self::PERMISSION_IDENTITY

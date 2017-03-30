@@ -4,7 +4,6 @@ namespace Spotman\Acl;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Spotman\Acl\Initializer\InitializerInterface;
-use Spotman\Acl\Resource\ResolvingResourceInterface;
 use Spotman\Acl\ResourcesCollector\ResourcesCollectorInterface;
 use Spotman\Acl\RolesCollector\RolesCollectorInterface;
 use Spotman\Acl\PermissionsCollector\PermissionsCollectorInterface;
@@ -69,6 +68,8 @@ class Acl implements LoggerAwareInterface
         $this->cache        = $cache;
 
         $this->cache->setNamespace($this->getCacheNamespace());
+
+        $this->init();
     }
 
     /**
@@ -116,14 +117,6 @@ class Acl implements LoggerAwareInterface
         $this->initialized = true;
     }
 
-    protected function getZendAcl()
-    {
-        // Make lazy initialization
-        $this->init();
-
-        return $this->acl;
-    }
-
     /**
      * @return \Spotman\Acl\AclUserInterface
      */
@@ -144,8 +137,41 @@ class Acl implements LoggerAwareInterface
             $resource = $this->resourceFactory->createResource($resource);
         }
 
+        if ($parentResource && !($parentResource instanceof ResourceInterface)) {
+            $parentResource = $this->resourceFactory->createResource($parentResource);
+        }
+
         $this->acl->addResource($resource, $parentResource);
+
+        // Add default permissions
+        $this->importResourceDefaultPermissions($resource);
+
         return $this;
+    }
+
+    protected function importResourceDefaultPermissions(ResourceInterface $resource)
+    {
+        foreach ($resource->getDefaultAccessList() as $permissionIdentity => $roles) { /** @var string[] $roles */
+            foreach ($roles as $role) {
+                $this->addAllowRule($role, $resource->getResourceId(), $permissionIdentity);
+            }
+        }
+    }
+
+    /**
+     * @param string $identity
+     *
+     * @return \Spotman\Acl\ResourceInterface|\Zend\Permissions\Acl\Resource\ResourceInterface
+     */
+    public function getResource($identity)
+    {
+        if (!$this->acl->hasResource($identity)) {
+            $resource = $this->resourceFactory->createResource($identity);
+            $this->addResource($resource);
+            return $resource;
+        }
+
+        return$this->acl->getResource($identity);
     }
 
     public function addRole($roleIdentity, $parentRolesIdentities = null)
@@ -165,6 +191,12 @@ class Acl implements LoggerAwareInterface
         return $this->acl->hasRole($roleIdentity);
     }
 
+    /**
+     * @param string|null $roleIdentity
+     * @param string|null $resourceIdentity
+     * @param string|null $permissionIdentity
+     * @param string|null $bindToResourceIdentity
+     */
     public function addAllowRule($roleIdentity = null, $resourceIdentity = null, $permissionIdentity = null, $bindToResourceIdentity = null)
     {
         if (!$bindToResourceIdentity) {
@@ -176,6 +208,12 @@ class Acl implements LoggerAwareInterface
         $this->acl->allow($roleIdentity, $bindToResourceIdentity, $permissionIdentity);
     }
 
+    /**
+     * @param string|null $roleIdentity
+     * @param string|null $resourceIdentity
+     * @param string|null $permissionIdentity
+     * @param string|null $bindToResourceIdentity
+     */
     public function removeAllowRule($roleIdentity = null, $resourceIdentity = null, $permissionIdentity = null, $bindToResourceIdentity = null)
     {
         if (!$bindToResourceIdentity) {
@@ -187,6 +225,12 @@ class Acl implements LoggerAwareInterface
         $this->acl->removeAllow($roleIdentity, $bindToResourceIdentity, $permissionIdentity);
     }
 
+    /**
+     * @param string|null $roleIdentity
+     * @param string|null $resourceIdentity
+     * @param string|null $permissionIdentity
+     * @param string|null $bindToResourceIdentity
+     */
     public function addDenyRule($roleIdentity = null, $resourceIdentity = null, $permissionIdentity = null, $bindToResourceIdentity = null)
     {
         if (!$bindToResourceIdentity) {
@@ -198,6 +242,12 @@ class Acl implements LoggerAwareInterface
         $this->acl->deny($roleIdentity, $bindToResourceIdentity, $permissionIdentity);
     }
 
+    /**
+     * @param string|null $roleIdentity
+     * @param string|null $resourceIdentity
+     * @param string|null $permissionIdentity
+     * @param string|null $bindToResourceIdentity
+     */
     public function removeDenyRule($roleIdentity = null, $resourceIdentity = null, $permissionIdentity = null, $bindToResourceIdentity = null)
     {
         if (!$bindToResourceIdentity) {
@@ -213,14 +263,17 @@ class Acl implements LoggerAwareInterface
      * Check for raw permission name
      *
      * @param \Spotman\Acl\ResourceInterface $resource
-     * @param string                         $permissionIdentity
+     * @param string|null                    $permissionIdentity
      * @param \Spotman\Acl\AclRoleInterface  $role
      *
      * @return bool
      */
     public function isAllowedToRole(ResourceInterface $resource, $permissionIdentity, AclRoleInterface $role)
     {
-        $this->init();
+        // Add missing resource and import it's default permissions
+        if (!$this->acl->hasResource($resource)) {
+            $this->addResource($resource);
+        }
 
         $permissionIdentity = $this->makeCompoundPermissionIdentity($resource->getResourceId(), $permissionIdentity);
 
@@ -299,17 +352,6 @@ class Acl implements LoggerAwareInterface
 
         if (!($this->acl && $this->acl instanceof \Zend\Permissions\Acl\Acl)) {
             throw new Exception('Cached data is not an Acl instance, :type given', [':type' => gettype($this->acl)]);
-        }
-
-        // Restore dependencies inside of resources
-        foreach ($this->acl->getResources() as $key) {
-            /** @var \Spotman\Acl\ResourceInterface $resource */
-            $resource = $this->acl->getResource($key);
-
-            // Restore Acl dependency inside of AccessResolver
-            if ($resource instanceof ResolvingResourceInterface) {
-                $resource->getResolver()->setAcl($this);
-            }
         }
     }
 

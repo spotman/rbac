@@ -10,7 +10,13 @@ abstract class AbstractResource implements ResourceInterface
      */
     private $identity;
 
-    public function __construct() {}
+    /**
+     * AbstractResource constructor.
+     *
+     * This object must be lightweight and has no external dependencies
+     * All operations must be done via Flyweight or Visitor patterns
+     */
+    final public function __construct() {}
 
     /**
      * Returns the string identifier of the Resource
@@ -33,22 +39,6 @@ abstract class AbstractResource implements ResourceInterface
         $baseName = substr($className, $pos + 1);
         return str_replace('Resource', '', $baseName);
     }
-
-    /**
-     * Returns true if permission is allowed
-     *
-     * @param string $permissionIdentity
-     *
-     * @return bool
-     */
-    abstract protected function isAllowed($permissionIdentity);
-
-    /**
-     * Returns list of available permission identities
-     *
-     * @return string[]
-     */
-    abstract public function getAvailablePermissionsIdentities();
 
     public function __sleep()
     {
