@@ -302,6 +302,11 @@ class Acl implements LoggerAwareInterface
         return false;
     }
 
+    public function isAllowedToCurrentUser(ResourceInterface $resource, $permissionIdentity)
+    {
+        return $this->isAllowedToUser($resource, $permissionIdentity, $this->currentUser);
+    }
+
     /**
      * @param string|null $resourceIdentity
      * @param string|null $permissionIdentity

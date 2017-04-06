@@ -4,7 +4,7 @@ namespace Spotman\Acl\Resource;
 use Spotman\Acl\Exception;
 use Spotman\Acl\Resolver\AccessResolverInterface;
 
-abstract class ResolvingResource extends AbstractResource implements ResolvingResourceInterface
+abstract class AbstractResolvingResource extends AbstractResource implements ResolvingResourceInterface
 {
     /**
      * @var AccessResolverInterface
@@ -27,7 +27,7 @@ abstract class ResolvingResource extends AbstractResource implements ResolvingRe
      *
      * @return bool
      */
-    protected function isAllowed($permissionIdentity)
+    public function isPermissionAllowed($permissionIdentity)
     {
         if (!$this->resolver) {
             throw new Exception('AccessResolver is missing, you must set it via useResolver() method');

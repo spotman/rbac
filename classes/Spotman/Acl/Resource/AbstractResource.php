@@ -32,6 +32,16 @@ abstract class AbstractResource implements ResourceInterface
         return $this->identity;
     }
 
+    /**
+     * Returns list of available permission identities
+     *
+     * @return string[]
+     */
+    public function getAvailablePermissionIdentities()
+    {
+        return array_keys($this->getDefaultAccessList());
+    }
+
     protected function detectIdentity()
     {
         $className = static::class;

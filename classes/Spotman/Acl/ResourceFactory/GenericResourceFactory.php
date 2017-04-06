@@ -15,7 +15,7 @@ class GenericResourceFactory implements ResourceFactoryInterface
     public function createResource($identity)
     {
         $ns = "\\Spotman\\Acl\\Resource\\";
-        $className = $ns.ucfirst($identity).'Resource';
+        $className = $ns.ucfirst($identity).'ApiResource';
 
         if (!class_exists($className)) {
             throw new Exception('Class :name does not exists', [':name' => $className]);

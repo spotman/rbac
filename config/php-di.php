@@ -29,25 +29,25 @@ return [
         AclUserInterface::class                 => DI\get('User'),
 
         // Cache (using Doctrine`s ArrayCache as default)
-        Acl::DI_CACHE_OBJECT_KEY                => DI\get(ArrayCache::class),
+        Acl::DI_CACHE_OBJECT_KEY                => DI\object(ArrayCache::class),
 
         // Basic initializer for DI containers with autowiring
         InitializerInterface::class             => DI\object(GenericInitializer::class)->lazy(), // Using lazy initializer pattern
 
         // Resolving resources` access relatively to current user
-        AccessResolverInterface::class          => DI\get(UserAccessResolver::class),
+        AccessResolverInterface::class          => DI\object(UserAccessResolver::class),
 
         // No roles by default
-        RolesCollectorInterface::class          => DI\get(EmptyRolesCollector::class),
+        RolesCollectorInterface::class          => DI\object(EmptyRolesCollector::class),
 
         // No resources by default
-        ResourcesCollectorInterface::class      => DI\get(EmptyResourcesCollector::class),
+        ResourcesCollectorInterface::class      => DI\object(EmptyResourcesCollector::class),
 
         // No permissions by default
-        PermissionsCollectorInterface::class    => DI\get(EmptyPermissionsCollector::class),
+        PermissionsCollectorInterface::class    => DI\object(EmptyPermissionsCollector::class),
 
         // Simple factory without DI
-        ResourceFactoryInterface::class         => DI\get(GenericResourceFactory::class),
+        ResourceFactoryInterface::class         => DI\object(GenericResourceFactory::class),
 
     ],
 

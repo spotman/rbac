@@ -12,4 +12,11 @@ interface ResolvingResourceInterface extends ResourceInterface
      * @return $this
      */
     public function useResolver(AccessResolverInterface $resolver);
+
+    /**
+     * @param string $permissionIdentity
+     *
+     * @return bool
+     */
+    public function isPermissionAllowed($permissionIdentity);
 }

@@ -1,13 +1,13 @@
 <?php
 namespace Spotman\Acl\Resource;
 
-abstract class SinglePermissionResource extends ResolvingResource
+abstract class SinglePermissionResource extends AbstractResolvingResource
 {
     const PERMISSION_IDENTITY = 'enabled';
 
     public function isEnabled()
     {
-        return $this->isAllowed(self::PERMISSION_IDENTITY);
+        return $this->isPermissionAllowed(self::PERMISSION_IDENTITY);
     }
 
     /**
