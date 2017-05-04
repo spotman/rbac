@@ -18,7 +18,7 @@ class AclFactory
      */
     public function createAcl()
     {
-        $di = Container::instance();
+        $di = Container::getInstance();
 
         $params = [
             'cache' => $di->get(Acl::DI_CACHE_OBJECT_KEY)
