@@ -4,8 +4,8 @@ use Spotman\Acl\Acl;
 use Spotman\Acl\AclUserInterface;
 use Spotman\Acl\Initializer\InitializerInterface;
 use Spotman\Acl\Initializer\GenericInitializer;
-use Spotman\Acl\Resolver\AccessResolverInterface;
-use Spotman\Acl\Resolver\UserAccessResolver;
+use Spotman\Acl\AccessResolver\AclAccessResolverInterface;
+use Spotman\Acl\AccessResolver\UserAccessResolver;
 use Spotman\Acl\ResourcesCollector\ResourcesCollectorInterface;
 use Spotman\Acl\ResourcesCollector\EmptyResourcesCollector;
 use Spotman\Acl\RolesCollector\RolesCollectorInterface;
@@ -26,28 +26,28 @@ return [
         })->scope(\DI\Scope::SINGLETON),
 
         // Current user
-        AclUserInterface::class                 => DI\get('User'),
+        AclUserInterface::class              => DI\get('User'),
 
         // Cache (using Doctrine`s ArrayCache as default)
-        Acl::DI_CACHE_OBJECT_KEY                => DI\object(ArrayCache::class),
+        Acl::DI_CACHE_OBJECT_KEY             => DI\object(ArrayCache::class),
 
         // Basic initializer for DI containers with autowiring
-        InitializerInterface::class             => DI\object(GenericInitializer::class)->lazy(), // Using lazy initializer pattern
+        InitializerInterface::class          => DI\object(GenericInitializer::class)->lazy(), // Using lazy initializer pattern
 
         // Resolving resources` access relatively to current user
-        AccessResolverInterface::class          => DI\object(UserAccessResolver::class),
+        AclAccessResolverInterface::class    => DI\object(UserAccessResolver::class),
 
         // No roles by default
-        RolesCollectorInterface::class          => DI\object(EmptyRolesCollector::class),
+        RolesCollectorInterface::class       => DI\object(EmptyRolesCollector::class),
 
         // No resources by default
-        ResourcesCollectorInterface::class      => DI\object(EmptyResourcesCollector::class),
+        ResourcesCollectorInterface::class   => DI\object(EmptyResourcesCollector::class),
 
         // No permissions by default
-        PermissionsCollectorInterface::class    => DI\object(EmptyPermissionsCollector::class),
+        PermissionsCollectorInterface::class => DI\object(EmptyPermissionsCollector::class),
 
         // Simple factory without DI
-        ResourceFactoryInterface::class         => DI\object(GenericResourceFactory::class),
+        ResourceFactoryInterface::class      => DI\object(GenericResourceFactory::class),
 
     ],
 

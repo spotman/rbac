@@ -1,17 +1,17 @@
 <?php
 namespace Spotman\Acl\Resource;
 
-use Spotman\Acl\Resolver\AccessResolverInterface;
+use Spotman\Acl\AccessResolver\AclAccessResolverInterface;
 use Spotman\Acl\ResourceInterface;
 
 interface ResolvingResourceInterface extends ResourceInterface
 {
     /**
-     * @param \Spotman\Acl\Resolver\AccessResolverInterface $resolver
+     * @param \Spotman\Acl\AccessResolver\AclAccessResolverInterface $resolver
      *
      * @return $this
      */
-    public function useResolver(AccessResolverInterface $resolver);
+    public function useResolver(AclAccessResolverInterface $resolver);
 
     /**
      * @param string $permissionIdentity

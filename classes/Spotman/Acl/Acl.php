@@ -85,7 +85,7 @@ class Acl implements LoggerAwareInterface
     }
 
     /**
-     * Must be called in factory after object creation coz there is circular dependencies Acl::init() => collect resources => AccessResolverInterface => Acl => Acl::init
+     * Must be called in factory after object creation coz there is circular dependencies Acl::init() => collect resources => AclAccessResolverInterface => Acl => Acl::init
      */
     private function init()
     {

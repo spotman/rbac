@@ -1,11 +1,11 @@
 <?php
-namespace Spotman\Acl\Resolver;
+namespace Spotman\Acl\AccessResolver;
 
 use Spotman\Acl\Acl;
 use Spotman\Acl\AclRoleInterface;
 use Spotman\Acl\ResourceInterface;
 
-class RoleAccessResolver implements AccessResolverInterface
+class RoleAccessResolver implements AclAccessResolverInterface
 {
     /**
      * @var Acl

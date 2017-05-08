@@ -1,7 +1,7 @@
 <?php
 namespace Spotman\Acl\Initializer;
 
-use Spotman\Acl\Resolver\AccessResolverInterface;
+use Spotman\Acl\AccessResolver\AclAccessResolverInterface;
 use Spotman\Acl\RolesCollector\RolesCollectorInterface;
 use Spotman\Acl\ResourcesCollector\ResourcesCollectorInterface;
 use Spotman\Acl\PermissionsCollector\PermissionsCollectorInterface;

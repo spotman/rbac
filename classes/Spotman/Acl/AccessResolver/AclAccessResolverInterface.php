@@ -1,9 +1,9 @@
 <?php
-namespace Spotman\Acl\Resolver;
+namespace Spotman\Acl\AccessResolver;
 
 use Spotman\Acl\ResourceInterface;
 
-interface AccessResolverInterface
+interface AclAccessResolverInterface
 {
     /**
      * @param \Spotman\Acl\ResourceInterface $resource

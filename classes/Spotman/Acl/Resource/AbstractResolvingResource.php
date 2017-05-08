@@ -2,21 +2,21 @@
 namespace Spotman\Acl\Resource;
 
 use Spotman\Acl\Exception;
-use Spotman\Acl\Resolver\AccessResolverInterface;
+use Spotman\Acl\AccessResolver\AclAccessResolverInterface;
 
 abstract class AbstractResolvingResource extends AbstractResource implements ResolvingResourceInterface
 {
     /**
-     * @var AccessResolverInterface
+     * @var AclAccessResolverInterface
      */
     private $resolver;
 
     /**
-     * @param \Spotman\Acl\Resolver\AccessResolverInterface $resolver
+     * @param \Spotman\Acl\AccessResolver\AclAccessResolverInterface $resolver
      *
      * @return $this
      */
-    public function useResolver(AccessResolverInterface $resolver)
+    public function useResolver(AclAccessResolverInterface $resolver)
     {
         $this->resolver = $resolver;
         return $this;
