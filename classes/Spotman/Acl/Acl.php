@@ -1,14 +1,14 @@
 <?php
 namespace Spotman\Acl;
 
+use Doctrine\Common\Cache\CacheProvider;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Spotman\Acl\Initializer\InitializerInterface;
-use Spotman\Acl\ResourcesCollector\ResourcesCollectorInterface;
-use Spotman\Acl\RolesCollector\RolesCollectorInterface;
 use Spotman\Acl\PermissionsCollector\PermissionsCollectorInterface;
 use Spotman\Acl\ResourceFactory\ResourceFactoryInterface;
-use Doctrine\Common\Cache\CacheProvider;
+use Spotman\Acl\ResourcesCollector\ResourcesCollectorInterface;
+use Spotman\Acl\RolesCollector\RolesCollectorInterface;
 
 class Acl implements LoggerAwareInterface
 {
@@ -42,6 +42,11 @@ class Acl implements LoggerAwareInterface
     private $permissionsCollector;
 
     /**
+     * @var \Spotman\Acl\ResourcePermissionsCollectorFactory\ResourcePermissionsCollectorFactoryInterface
+     */
+    private $resourcePermissionsCollectorFactory;
+
+    /**
      * @var ResourceFactoryInterface
      */
     private $resourceFactory;
@@ -59,14 +64,15 @@ class Acl implements LoggerAwareInterface
     public function __construct(InitializerInterface $initializer, AclUserInterface $user, CacheProvider $cache)
     {
         // Fetch objects from initializer
-        $this->rolesCollector       = $initializer->getRolesCollector();
-        $this->resourceFactory      = $initializer->getResourceFactory();
-        $this->resourcesCollector   = $initializer->getResourcesCollector();
-        $this->permissionsCollector = $initializer->getPermissionsCollector();
+        $this->rolesCollector                      = $initializer->getRolesCollector();
+        $this->resourceFactory                     = $initializer->getResourceFactory();
+        $this->resourcesCollector                  = $initializer->getResourcesCollector();
+        $this->permissionsCollector                = $initializer->getPermissionsCollector();
+        $this->resourcePermissionsCollectorFactory = $initializer->getResourcePermissionsCollectorFactory();
 
-        $this->currentUser  = $user;
-        $this->cache        = $cache;
+        $this->currentUser = $user;
 
+        $this->cache = $cache;
         $this->cache->setNamespace($this->getCacheNamespace());
 
         $this->init();
@@ -97,6 +103,7 @@ class Acl implements LoggerAwareInterface
         if ($cachedData = $this->getCachedData()) {
             $this->logger && $this->logger->debug('Loading Acl from cached data');
             $this->restoreFromCacheData($cachedData);
+
             return;
         }
 
@@ -146,12 +153,21 @@ class Acl implements LoggerAwareInterface
         // Add default permissions
         $this->importResourceDefaultPermissions($resource);
 
+        // Use custom permissions collector for current resource
+        if ($resource->isCustomPermissionCollectorUsed()) {
+            /** @var PermissionsCollectorInterface $collectorInstance */
+            $collectorInstance = $this->resourcePermissionsCollectorFactory->createCollector($resource);
+
+            $collectorInstance->collectPermissions($this);
+        }
+
         return $this;
     }
 
     protected function importResourceDefaultPermissions(ResourceInterface $resource)
     {
-        foreach ($resource->getDefaultAccessList() as $permissionIdentity => $roles) { /** @var string[] $roles */
+        foreach ($resource->getDefaultAccessList() as $permissionIdentity => $roles) {
+            /** @var string[] $roles */
             foreach ($roles as $role) {
                 $this->addAllowRule($role, $resource->getResourceId(), $permissionIdentity);
             }
@@ -168,21 +184,24 @@ class Acl implements LoggerAwareInterface
         if (!$this->acl->hasResource($identity)) {
             $resource = $this->resourceFactory->createResource($identity);
             $this->addResource($resource);
+
             return $resource;
         }
 
-        return$this->acl->getResource($identity);
+        return $this->acl->getResource($identity);
     }
 
     public function addRole($roleIdentity, $parentRolesIdentities = null)
     {
         $this->acl->addRole($roleIdentity, $parentRolesIdentities);
+
         return $this;
     }
 
     public function removeRole($roleIdentity)
     {
         $this->acl->removeRole($roleIdentity);
+
         return $this;
     }
 
@@ -313,7 +332,7 @@ class Acl implements LoggerAwareInterface
      *
      * @return null|string
      */
-    protected function makeCompoundPermissionIdentity($resourceIdentity = null,  $permissionIdentity = null)
+    protected function makeCompoundPermissionIdentity($resourceIdentity = null, $permissionIdentity = null)
     {
         if ($permissionIdentity === null || $resourceIdentity === null) {
             return $permissionIdentity;

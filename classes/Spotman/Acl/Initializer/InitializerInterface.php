@@ -22,4 +22,9 @@ interface InitializerInterface
      * @return \Spotman\Acl\ResourceFactory\ResourceFactoryInterface
      */
     public function getResourceFactory();
+
+    /**
+     * @return \Spotman\Acl\ResourcePermissionsCollectorFactory\ResourcePermissionsCollectorFactoryInterface
+     */
+    public function getResourcePermissionsCollectorFactory();
 }

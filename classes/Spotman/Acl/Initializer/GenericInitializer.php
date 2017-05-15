@@ -1,11 +1,11 @@
 <?php
 namespace Spotman\Acl\Initializer;
 
-use Spotman\Acl\AccessResolver\AclAccessResolverInterface;
-use Spotman\Acl\RolesCollector\RolesCollectorInterface;
-use Spotman\Acl\ResourcesCollector\ResourcesCollectorInterface;
 use Spotman\Acl\PermissionsCollector\PermissionsCollectorInterface;
 use Spotman\Acl\ResourceFactory\ResourceFactoryInterface;
+use Spotman\Acl\ResourcePermissionsCollectorFactory\ResourcePermissionsCollectorFactoryInterface;
+use Spotman\Acl\ResourcesCollector\ResourcesCollectorInterface;
+use Spotman\Acl\RolesCollector\RolesCollectorInterface;
 
 class GenericInitializer implements InitializerInterface
 {
@@ -30,24 +30,32 @@ class GenericInitializer implements InitializerInterface
     private $resourceFactory;
 
     /**
+     * @var ResourcePermissionsCollectorFactoryInterface
+     */
+    private $resourcePermissionsCollectorFactory;
+
+    /**
      * GenericInitializer constructor.
      *
      * @param \Spotman\Acl\ResourceFactory\ResourceFactoryInterface           $resourceFactory
      * @param \Spotman\Acl\RolesCollector\RolesCollectorInterface             $rolesCollector
      * @param \Spotman\Acl\ResourcesCollector\ResourcesCollectorInterface     $resourcesCollector
      * @param \Spotman\Acl\PermissionsCollector\PermissionsCollectorInterface $permissionsCollector
+     * @param ResourcePermissionsCollectorFactoryInterface                    $resourcePermissionsCollectorFactory
      */
     public function __construct(
         ResourceFactoryInterface $resourceFactory,
         RolesCollectorInterface $rolesCollector,
         ResourcesCollectorInterface $resourcesCollector,
-        PermissionsCollectorInterface $permissionsCollector
+        PermissionsCollectorInterface $permissionsCollector,
+        ResourcePermissionsCollectorFactoryInterface $resourcePermissionsCollectorFactory
     )
     {
-        $this->resourceFactory          = $resourceFactory;
-        $this->rolesCollector           = $rolesCollector;
-        $this->resourcesCollector       = $resourcesCollector;
-        $this->permissionsCollector     = $permissionsCollector;
+        $this->resourceFactory                     = $resourceFactory;
+        $this->rolesCollector                      = $rolesCollector;
+        $this->resourcesCollector                  = $resourcesCollector;
+        $this->permissionsCollector                = $permissionsCollector;
+        $this->resourcePermissionsCollectorFactory = $resourcePermissionsCollectorFactory;
     }
 
     /**
@@ -80,5 +88,13 @@ class GenericInitializer implements InitializerInterface
     public function getResourceFactory()
     {
         return $this->resourceFactory;
+    }
+
+    /**
+     * @return \Spotman\Acl\ResourcePermissionsCollectorFactory\ResourcePermissionsCollectorFactoryInterface
+     */
+    public function getResourcePermissionsCollectorFactory()
+    {
+        return $this->resourcePermissionsCollectorFactory;
     }
 }

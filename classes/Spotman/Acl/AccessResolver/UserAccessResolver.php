@@ -20,7 +20,7 @@ class UserAccessResolver implements AclAccessResolverInterface
     /**
      * UserAccessResolver constructor.
      *
-     * @param \Spotman\Acl\Acl  $acl
+     * @param \Spotman\Acl\Acl $acl
      */
     public function __construct(Acl $acl)
     {
@@ -41,15 +41,16 @@ class UserAccessResolver implements AclAccessResolverInterface
     /**
      * @param \Spotman\Acl\Acl $acl
      */
-    public function setAcl(Acl $acl)
+    private function setAcl(Acl $acl)
     {
-        $this->acl = $acl;
+        $this->acl  = $acl;
         $this->user = $acl->getCurrentUser(); // Preset current user as default value
     }
 
     public function setUser(AclUserInterface $user)
     {
         $this->user = $user;
+
         return $this;
     }
 }

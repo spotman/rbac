@@ -14,6 +14,8 @@ use Spotman\Acl\PermissionsCollector\PermissionsCollectorInterface;
 use Spotman\Acl\PermissionsCollector\EmptyPermissionsCollector;
 use Spotman\Acl\ResourceFactory\ResourceFactoryInterface;
 use Spotman\Acl\ResourceFactory\GenericResourceFactory;
+use Spotman\Acl\ResourcePermissionsCollectorFactory\ResourcePermissionsCollectorFactoryInterface;
+use Spotman\Acl\ResourcePermissionsCollectorFactory\GenericResourcePermissionsCollectorFactory;
 use Doctrine\Common\Cache\ArrayCache;
 
 return [
@@ -48,6 +50,9 @@ return [
 
         // Simple factory without DI
         ResourceFactoryInterface::class      => DI\object(GenericResourceFactory::class),
+
+        // Basic factory
+        ResourcePermissionsCollectorFactoryInterface::class => DI\object(GenericResourcePermissionsCollectorFactory::class),
 
     ],
 

@@ -18,4 +18,11 @@ interface ResourceInterface extends \Zend\Permissions\Acl\Resource\ResourceInter
      * @return string[][]
      */
     public function getDefaultAccessList();
+
+    /**
+     * Returns true if this resource needs custom permission collector
+     *
+     * @return bool
+     */
+    public function isCustomPermissionCollectorUsed();
 }

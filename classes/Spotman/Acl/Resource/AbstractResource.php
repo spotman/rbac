@@ -55,4 +55,26 @@ abstract class AbstractResource implements ResourceInterface
         // Do not serialize any data - this class must be stateless
         return [];
     }
+
+    /**
+     * The __toString method allows a class to decide how it will react when it is converted to a string.
+     *
+     * @return string
+     * @link http://php.net/manual/en/language.oop5.magic.php#language.oop5.magic.tostring
+     */
+    public function __toString()
+    {
+        return $this->getResourceId();
+    }
+
+    /**
+     * Returns true if this resource needs custom permission collector
+     *
+     * @return bool
+     */
+    public function isCustomPermissionCollectorUsed()
+    {
+        // False by default
+        return false;
+    }
 }
