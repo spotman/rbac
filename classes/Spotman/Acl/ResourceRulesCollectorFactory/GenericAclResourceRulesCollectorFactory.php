@@ -1,11 +1,11 @@
 <?php
-namespace Spotman\Acl\ResourcePermissionsCollectorFactory;
+namespace Spotman\Acl\ResourceRulesCollectorFactory;
 
 use BetaKiller\Factory\NamespaceBasedFactory;
 use Spotman\Acl\ResourceInterface;
-use Spotman\Acl\ResourcePermissionsCollector\ResourcePermissionsCollectorInterface;
+use Spotman\Acl\ResourceRulesCollector\ResourceRulesCollectorInterface;
 
-class GenericResourcePermissionsCollectorFactory implements ResourcePermissionsCollectorFactoryInterface
+class GenericAclResourceRulesCollectorFactory implements AclResourceRulesCollectorFactoryInterface
 {
     /**
      * @var \BetaKiller\Factory\NamespaceBasedFactory
@@ -13,22 +13,22 @@ class GenericResourcePermissionsCollectorFactory implements ResourcePermissionsC
     private $factory;
 
     /**
-     * GenericResourcePermissionsCollectorFactory constructor.
+     * GenericAclResourceRulesCollectorFactory constructor.
      *
      * @param \BetaKiller\Factory\NamespaceBasedFactory $factory
      */
     public function __construct(NamespaceBasedFactory $factory)
     {
         $this->factory = $factory
-            ->setClassPrefixes('Acl', 'ResourcePermissionsCollector')
-            ->setClassSuffix('ResourcePermissionsCollector')
-            ->setExpectedInterface(ResourcePermissionsCollectorInterface::class);
+            ->setClassPrefixes('Acl', 'ResourceRulesCollector')
+            ->setClassSuffix('ResourceRulesCollector')
+            ->setExpectedInterface(ResourceRulesCollectorInterface::class);
     }
 
     /**
      * @param \Spotman\Acl\ResourceInterface $resource
      *
-     * @return \Spotman\Acl\ResourcePermissionsCollector\ResourcePermissionsCollectorInterface
+     * @return \Spotman\Acl\ResourceRulesCollector\ResourceRulesCollectorInterface
      */
     public function createCollector(ResourceInterface $resource)
     {

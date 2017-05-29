@@ -1,14 +1,14 @@
 <?php
 namespace Spotman\Acl\AccessResolver;
 
-use Spotman\Acl\Acl;
+use Spotman\Acl\AclInterface;
 use Spotman\Acl\AclRoleInterface;
 use Spotman\Acl\ResourceInterface;
 
 class RoleAccessResolver implements AclAccessResolverInterface
 {
     /**
-     * @var Acl
+     * @var \Spotman\Acl\AclInterface
      */
     private $acl;
 
@@ -20,9 +20,9 @@ class RoleAccessResolver implements AclAccessResolverInterface
     /**
      * RoleAccessResolver constructor.
      *
-     * @param \Spotman\Acl\Acl           $acl
+     * @param \Spotman\Acl\AclInterface $acl
      */
-    public function __construct(Acl $acl)
+    public function __construct(AclInterface $acl)
     {
         $this->setAcl($acl);
     }
@@ -30,15 +30,16 @@ class RoleAccessResolver implements AclAccessResolverInterface
     public function setRole(AclRoleInterface $role)
     {
         $this->role = $role;
+
         return $this;
     }
 
     /**
      * Stores Acl instance after unserialize
      *
-     * @param \Spotman\Acl\Acl $acl
+     * @param \Spotman\Acl\AclInterface $acl
      */
-    public function setAcl(Acl $acl)
+    public function setAcl(AclInterface $acl)
     {
         $this->acl = $acl;
     }

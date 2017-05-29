@@ -2,18 +2,15 @@
 namespace Spotman\Acl;
 
 use Doctrine\Common\Cache\CacheProvider;
-use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
-use Spotman\Acl\Initializer\InitializerInterface;
-use Spotman\Acl\PermissionsCollector\PermissionsCollectorInterface;
-use Spotman\Acl\ResourceFactory\ResourceFactoryInterface;
-use Spotman\Acl\ResourcesCollector\ResourcesCollectorInterface;
-use Spotman\Acl\RolesCollector\RolesCollectorInterface;
+use Spotman\Acl\Initializer\AclInitializerInterface;
+use Spotman\Acl\RulesCollector\AclRulesCollectorInterface;
+use Spotman\Acl\ResourceFactory\AclResourceFactoryInterface;
+use Spotman\Acl\ResourcesCollector\AclResourcesCollectorInterface;
+use Spotman\Acl\RolesCollector\AclRolesCollectorInterface;
 
-class Acl implements LoggerAwareInterface
+class Acl implements AclInterface
 {
-    const DI_CACHE_OBJECT_KEY = 'AclCache';
-
     private $initialized = false;
 
     /**
@@ -27,27 +24,27 @@ class Acl implements LoggerAwareInterface
     private $acl;
 
     /**
-     * @var ResourcesCollectorInterface
+     * @var AclResourcesCollectorInterface
      */
     private $resourcesCollector;
 
     /**
-     * @var RolesCollectorInterface
+     * @var AclRolesCollectorInterface
      */
     private $rolesCollector;
 
     /**
-     * @var PermissionsCollectorInterface
+     * @var AclRulesCollectorInterface
      */
     private $permissionsCollector;
 
     /**
-     * @var \Spotman\Acl\ResourcePermissionsCollectorFactory\ResourcePermissionsCollectorFactoryInterface
+     * @var \Spotman\Acl\ResourceRulesCollectorFactory\AclResourceRulesCollectorFactoryInterface
      */
-    private $resourcePermissionsCollectorFactory;
+    private $resourceRulesCollectorFactory;
 
     /**
-     * @var ResourceFactoryInterface
+     * @var AclResourceFactoryInterface
      */
     private $resourceFactory;
 
@@ -61,14 +58,14 @@ class Acl implements LoggerAwareInterface
      */
     private $cache;
 
-    public function __construct(InitializerInterface $initializer, AclUserInterface $user, CacheProvider $cache)
+    public function __construct(AclInitializerInterface $initializer, AclUserInterface $user, CacheProvider $cache)
     {
         // Fetch objects from initializer
-        $this->rolesCollector                      = $initializer->getRolesCollector();
-        $this->resourceFactory                     = $initializer->getResourceFactory();
-        $this->resourcesCollector                  = $initializer->getResourcesCollector();
-        $this->permissionsCollector                = $initializer->getPermissionsCollector();
-        $this->resourcePermissionsCollectorFactory = $initializer->getResourcePermissionsCollectorFactory();
+        $this->rolesCollector                = $initializer->getRolesCollector();
+        $this->resourceFactory               = $initializer->getResourceFactory();
+        $this->resourcesCollector            = $initializer->getResourcesCollector();
+        $this->permissionsCollector          = $initializer->getPermissionsCollector();
+        $this->resourceRulesCollectorFactory = $initializer->getResourceRulesCollectorFactory();
 
         $this->currentUser = $user;
 
@@ -155,8 +152,8 @@ class Acl implements LoggerAwareInterface
 
         // Use custom permissions collector for current resource
         if ($resource->isCustomPermissionCollectorUsed()) {
-            /** @var PermissionsCollectorInterface $collectorInstance */
-            $collectorInstance = $this->resourcePermissionsCollectorFactory->createCollector($resource);
+            /** @var AclRulesCollectorInterface $collectorInstance */
+            $collectorInstance = $this->resourceRulesCollectorFactory->createCollector($resource);
 
             $collectorInstance->collectPermissions($this);
         }
@@ -321,7 +318,7 @@ class Acl implements LoggerAwareInterface
         return false;
     }
 
-    public function isAllowedToCurrentUser(ResourceInterface $resource, $permissionIdentity)
+    public function isAllowed(ResourceInterface $resource, $permissionIdentity)
     {
         return $this->isAllowedToUser($resource, $permissionIdentity, $this->currentUser);
     }

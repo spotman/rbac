@@ -1,16 +1,16 @@
 <?php
 namespace Spotman\Acl\ResourcesCollector;
 
-use Spotman\Acl\Acl;
+use Spotman\Acl\AclInterface;
 
-class EmptyResourcesCollector implements ResourcesCollectorInterface
+class EmptyAclResourcesCollector implements AclResourcesCollectorInterface
 {
     /**
      * Collect resources from external source and add them to acl via public methods Acl::addResource / Acl::removeResource
      *
-     * @param \Spotman\Acl\Acl $acl
+     * @param \Spotman\Acl\AclInterface $acl
      */
-    public function collectResources(Acl $acl)
+    public function collectResources(AclInterface $acl)
     {
         // Empty
     }

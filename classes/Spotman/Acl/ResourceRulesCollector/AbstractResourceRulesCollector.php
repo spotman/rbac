@@ -1,11 +1,11 @@
 <?php
-namespace Spotman\Acl\ResourcePermissionsCollector;
+namespace Spotman\Acl\ResourceRulesCollector;
 
-use Spotman\Acl\Acl;
-use Spotman\Acl\PermissionsCollector\PermissionsCollectorInterface;
+use Spotman\Acl\AclInterface;
+use Spotman\Acl\RulesCollector\AclRulesCollectorInterface;
 use Spotman\Acl\ResourceInterface;
 
-abstract class AbstractResourcePermissionsCollector implements PermissionsCollectorInterface
+abstract class AbstractResourceRulesCollector implements AclRulesCollectorInterface
 {
     /**
      * @var \Spotman\Acl\ResourceInterface
@@ -13,7 +13,7 @@ abstract class AbstractResourcePermissionsCollector implements PermissionsCollec
     protected $resource;
 
     /**
-     * AbstractResourcePermissionsCollector constructor.
+     * AbstractResourceRulesCollector constructor.
      *
      * @param \Spotman\Acl\ResourceInterface $resource
      */
@@ -25,9 +25,9 @@ abstract class AbstractResourcePermissionsCollector implements PermissionsCollec
     /**
      * Collect entities from external source and add them to acl via protected methods addAllowRule / addDenyRule
      *
-     * @param \Spotman\Acl\Acl $acl
+     * @param \Spotman\Acl\AclInterface $acl
      */
-    public function collectPermissions(Acl $acl)
+    public function collectPermissions(AclInterface $acl)
     {
         $pairs = $this->getPermissionsRoles();
 

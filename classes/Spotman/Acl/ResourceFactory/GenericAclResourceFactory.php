@@ -4,7 +4,7 @@ namespace Spotman\Acl\ResourceFactory;
 use Spotman\Acl\ResourceInterface;
 use Spotman\Acl\Exception;
 
-class GenericResourceFactory implements ResourceFactoryInterface
+class GenericAclResourceFactory implements AclResourceFactoryInterface
 {
     /**
      * @param string $identity

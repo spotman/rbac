@@ -3,7 +3,7 @@ namespace Spotman\Acl\ResourceFactory;
 
 use Spotman\Acl\ResourceInterface;
 
-interface ResourceFactoryInterface
+interface AclResourceFactoryInterface
 {
     /**
      * @param string            $identity

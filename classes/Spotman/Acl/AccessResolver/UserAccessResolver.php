@@ -1,14 +1,14 @@
 <?php
 namespace Spotman\Acl\AccessResolver;
 
-use Spotman\Acl\Acl;
+use Spotman\Acl\AclInterface;
 use Spotman\Acl\AclUserInterface;
 use Spotman\Acl\ResourceInterface;
 
 class UserAccessResolver implements AclAccessResolverInterface
 {
     /**
-     * @var Acl
+     * @var \Spotman\Acl\AclInterface
      */
     private $acl;
 
@@ -20,9 +20,9 @@ class UserAccessResolver implements AclAccessResolverInterface
     /**
      * UserAccessResolver constructor.
      *
-     * @param \Spotman\Acl\Acl $acl
+     * @param \Spotman\Acl\AclInterface $acl
      */
-    public function __construct(Acl $acl)
+    public function __construct(AclInterface $acl)
     {
         $this->setAcl($acl);
     }
@@ -39,9 +39,9 @@ class UserAccessResolver implements AclAccessResolverInterface
     }
 
     /**
-     * @param \Spotman\Acl\Acl $acl
+     * @param \Spotman\Acl\AclInterface $acl
      */
-    private function setAcl(Acl $acl)
+    private function setAcl(AclInterface $acl)
     {
         $this->acl  = $acl;
         $this->user = $acl->getCurrentUser(); // Preset current user as default value
