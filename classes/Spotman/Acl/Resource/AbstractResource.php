@@ -72,9 +72,23 @@ abstract class AbstractResource implements ResourceInterface
      *
      * @return bool
      */
-    public function isCustomPermissionCollectorUsed()
+    public function isCustomRulesCollectorUsed()
     {
         // False by default
         return false;
+    }
+
+    /**
+     * Returns true if permission was previously defined
+     *
+     * @param string $name
+     *
+     * @return bool
+     */
+    protected function isPermissionDefined($name)
+    {
+        $default = $this->getDefaultAccessList();
+
+        return isset($default[$name]);
     }
 }

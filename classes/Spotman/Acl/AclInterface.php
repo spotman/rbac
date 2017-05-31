@@ -23,7 +23,7 @@ interface AclInterface extends LoggerAwareInterface
     /**
      * @param string $identity
      *
-     * @return \Spotman\Acl\ResourceInterface|\Zend\Permissions\Acl\Resource\ResourceInterface
+     * @return \Spotman\Acl\ResourceInterface
      */
     public function getResource($identity);
 

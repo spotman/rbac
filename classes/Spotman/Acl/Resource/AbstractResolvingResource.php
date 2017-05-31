@@ -1,8 +1,8 @@
 <?php
 namespace Spotman\Acl\Resource;
 
-use Spotman\Acl\Exception;
 use Spotman\Acl\AccessResolver\AclAccessResolverInterface;
+use Spotman\Acl\Exception;
 
 abstract class AbstractResolvingResource extends AbstractResource implements ResolvingResourceInterface
 {
@@ -19,6 +19,7 @@ abstract class AbstractResolvingResource extends AbstractResource implements Res
     public function useResolver(AclAccessResolverInterface $resolver)
     {
         $this->resolver = $resolver;
+
         return $this;
     }
 

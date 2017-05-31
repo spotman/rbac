@@ -24,5 +24,5 @@ interface ResourceInterface extends \Zend\Permissions\Acl\Resource\ResourceInter
      *
      * @return bool
      */
-    public function isCustomPermissionCollectorUsed();
+    public function isCustomRulesCollectorUsed();
 }

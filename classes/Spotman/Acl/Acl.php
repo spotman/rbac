@@ -151,7 +151,7 @@ class Acl implements AclInterface
         $this->importResourceDefaultPermissions($resource);
 
         // Use custom permissions collector for current resource
-        if ($resource->isCustomPermissionCollectorUsed()) {
+        if ($resource->isCustomRulesCollectorUsed()) {
             /** @var AclRulesCollectorInterface $collectorInstance */
             $collectorInstance = $this->resourceRulesCollectorFactory->createCollector($resource);
 
