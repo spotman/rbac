@@ -7,9 +7,9 @@ interface AclAccessResolverInterface
 {
     /**
      * @param \Spotman\Acl\ResourceInterface $resource
-     * @param                                $permissionIdentity
+     * @param string                         $permissionIdentity
      *
      * @return bool
      */
-    public function isAllowed(ResourceInterface $resource, $permissionIdentity);
+    public function isAllowed(ResourceInterface $resource, string $permissionIdentity): bool;
 }

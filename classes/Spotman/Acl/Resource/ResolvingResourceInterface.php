@@ -18,5 +18,5 @@ interface ResolvingResourceInterface extends ResourceInterface
      *
      * @return bool
      */
-    public function isPermissionAllowed($permissionIdentity);
+    public function isPermissionAllowed(string $permissionIdentity): bool;
 }

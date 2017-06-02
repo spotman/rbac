@@ -23,7 +23,7 @@ abstract class AbstractResource implements ResourceInterface
      *
      * @return string
      */
-    public function getResourceId()
+    public function getResourceId(): string
     {
         if (!$this->identity) {
             $this->identity = $this->detectIdentity();
@@ -37,7 +37,7 @@ abstract class AbstractResource implements ResourceInterface
      *
      * @return string[]
      */
-    public function getAvailablePermissionIdentities()
+    public function getAvailablePermissionIdentities(): array
     {
         return array_keys($this->getDefaultAccessList());
     }
@@ -72,7 +72,7 @@ abstract class AbstractResource implements ResourceInterface
      *
      * @return bool
      */
-    public function isCustomRulesCollectorUsed()
+    public function isCustomRulesCollectorUsed(): bool
     {
         // False by default
         return false;
@@ -85,7 +85,7 @@ abstract class AbstractResource implements ResourceInterface
      *
      * @return bool
      */
-    protected function isPermissionDefined($name)
+    protected function isPermissionDefined(string $name): bool
     {
         $default = $this->getDefaultAccessList();
 

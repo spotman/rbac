@@ -5,7 +5,7 @@ abstract class SinglePermissionResource extends AbstractResolvingResource
 {
     const PERMISSION_IDENTITY = 'enabled';
 
-    public function isEnabled()
+    public function isEnabled(): bool
     {
         return $this->isPermissionAllowed(self::PERMISSION_IDENTITY);
     }
@@ -15,7 +15,7 @@ abstract class SinglePermissionResource extends AbstractResolvingResource
      *
      * @return string[]
      */
-    final public function getAvailablePermissionIdentities()
+    final public function getAvailablePermissionIdentities(): array
     {
         return [
             self::PERMISSION_IDENTITY

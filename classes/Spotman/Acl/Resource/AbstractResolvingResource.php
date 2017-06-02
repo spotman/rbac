@@ -28,7 +28,7 @@ abstract class AbstractResolvingResource extends AbstractResource implements Res
      *
      * @return bool
      */
-    public function isPermissionAllowed($permissionIdentity)
+    public function isPermissionAllowed(string $permissionIdentity): bool
     {
         if (!$this->resolver) {
             throw new Exception('AccessResolver is missing, you must set it via useResolver() method');

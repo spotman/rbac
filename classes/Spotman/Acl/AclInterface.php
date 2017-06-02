@@ -10,44 +10,44 @@ interface AclInterface extends LoggerAwareInterface
     /**
      * @return \Spotman\Acl\AclUserInterface
      */
-    public function getCurrentUser();
+    public function getCurrentUser(): AclUserInterface;
 
     /**
      * @param \Spotman\Acl\ResourceInterface|string      $resource
      * @param \Spotman\Acl\ResourceInterface|string|null $parentResource
      *
-     * @return $this
+     * @return \Spotman\Acl\AclInterface
      */
-    public function addResource($resource, $parentResource = null);
+    public function addResource($resource, $parentResource = null): AclInterface;
 
     /**
      * @param string $identity
      *
      * @return \Spotman\Acl\ResourceInterface
      */
-    public function getResource($identity);
+    public function getResource(string $identity): ResourceInterface;
 
     /**
-     * @param string     $roleIdentity
+     * @param string        $roleIdentity
      * @param string[]|null $parentRolesIdentities
      *
      * @return \Spotman\Acl\AclInterface
      */
-    public function addRole($roleIdentity, $parentRolesIdentities = null);
+    public function addRole(string $roleIdentity, array $parentRolesIdentities = null): AclInterface;
 
     /**
      * @param string $roleIdentity
      *
      * @return \Spotman\Acl\AclInterface
      */
-    public function removeRole($roleIdentity);
+    public function removeRole(string $roleIdentity): AclInterface;
 
     /**
      * @param string $roleIdentity
      *
      * @return bool
      */
-    public function hasRole($roleIdentity);
+    public function hasRole(string $roleIdentity): bool;
 
     /**
      * @param string|null $roleIdentity
@@ -55,7 +55,7 @@ interface AclInterface extends LoggerAwareInterface
      * @param string|null $permissionIdentity
      * @param string|null $bindToResourceIdentity
      */
-    public function addAllowRule($roleIdentity = null, $resourceIdentity = null, $permissionIdentity = null, $bindToResourceIdentity = null);
+    public function addAllowRule(?string $roleIdentity = null, ?string $resourceIdentity = null, ?string $permissionIdentity = null, ?string $bindToResourceIdentity = null): void;
 
     /**
      * @param string|null $roleIdentity
@@ -63,7 +63,7 @@ interface AclInterface extends LoggerAwareInterface
      * @param string|null $permissionIdentity
      * @param string|null $bindToResourceIdentity
      */
-    public function removeAllowRule($roleIdentity = null, $resourceIdentity = null, $permissionIdentity = null, $bindToResourceIdentity = null);
+    public function removeAllowRule(?string $roleIdentity = null, ?string $resourceIdentity = null, ?string $permissionIdentity = null, ?string $bindToResourceIdentity = null): void;
 
     /**
      * @param string|null $roleIdentity
@@ -71,7 +71,7 @@ interface AclInterface extends LoggerAwareInterface
      * @param string|null $permissionIdentity
      * @param string|null $bindToResourceIdentity
      */
-    public function addDenyRule($roleIdentity = null, $resourceIdentity = null, $permissionIdentity = null, $bindToResourceIdentity = null);
+    public function addDenyRule(?string $roleIdentity = null, ?string $resourceIdentity = null, ?string $permissionIdentity = null, ?string $bindToResourceIdentity = null): void;
 
     /**
      * @param string|null $roleIdentity
@@ -79,7 +79,7 @@ interface AclInterface extends LoggerAwareInterface
      * @param string|null $permissionIdentity
      * @param string|null $bindToResourceIdentity
      */
-    public function removeDenyRule($roleIdentity = null, $resourceIdentity = null, $permissionIdentity = null, $bindToResourceIdentity = null);
+    public function removeDenyRule(?string $roleIdentity = null, ?string $resourceIdentity = null, ?string $permissionIdentity = null, ?string $bindToResourceIdentity = null): void;
 
     /**
      * Check for raw permission name
@@ -90,7 +90,7 @@ interface AclInterface extends LoggerAwareInterface
      *
      * @return bool
      */
-    public function isAllowedToRole(ResourceInterface $resource, $permissionIdentity, AclRoleInterface $role);
+    public function isAllowedToRole(ResourceInterface $resource, string $permissionIdentity, AclRoleInterface $role): bool;
 
     /**
      * Check for raw permission name
@@ -101,13 +101,13 @@ interface AclInterface extends LoggerAwareInterface
      *
      * @return bool
      */
-    public function isAllowedToUser(ResourceInterface $resource, $permissionIdentity, AclUserInterface $user);
+    public function isAllowedToUser(ResourceInterface $resource, string $permissionIdentity, AclUserInterface $user): bool;
 
     /**
      * @param \Spotman\Acl\ResourceInterface $resource
-     * @param string                               $permissionIdentity
+     * @param string                         $permissionIdentity
      *
      * @return bool
      */
-    public function isAllowed(ResourceInterface $resource, $permissionIdentity);
+    public function isAllowed(ResourceInterface $resource, string $permissionIdentity): bool;
 }

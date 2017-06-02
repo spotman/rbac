@@ -8,7 +8,7 @@ interface ResourceInterface extends \Zend\Permissions\Acl\Resource\ResourceInter
      *
      * @return string[]
      */
-    public function getAvailablePermissionIdentities();
+    public function getAvailablePermissionIdentities(): array;
 
     /**
      * Returns default permissions bundled with current resource
@@ -17,12 +17,12 @@ interface ResourceInterface extends \Zend\Permissions\Acl\Resource\ResourceInter
      *
      * @return string[][]
      */
-    public function getDefaultAccessList();
+    public function getDefaultAccessList(): array;
 
     /**
      * Returns true if this resource needs custom permission collector
      *
      * @return bool
      */
-    public function isCustomRulesCollectorUsed();
+    public function isCustomRulesCollectorUsed(): bool;
 }
