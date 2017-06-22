@@ -4,10 +4,12 @@ namespace Spotman\Acl;
 use Doctrine\Common\Cache\CacheProvider;
 use Psr\Log\LoggerInterface;
 use Spotman\Acl\Initializer\AclInitializerInterface;
+use Spotman\Acl\Resource\ResolvingResourceInterface;
 use Spotman\Acl\RulesCollector\AclRulesCollectorInterface;
 use Spotman\Acl\ResourceFactory\AclResourceFactoryInterface;
 use Spotman\Acl\ResourcesCollector\AclResourcesCollectorInterface;
 use Spotman\Acl\RolesCollector\AclRolesCollectorInterface;
+use Spotman\Acl\AccessResolver\AclAccessResolverInterface;
 
 class Acl implements AclInterface
 {
@@ -49,6 +51,11 @@ class Acl implements AclInterface
     private $resourceFactory;
 
     /**
+     * @var \Spotman\Acl\AccessResolver\AclAccessResolverInterface
+     */
+    private $accessResolver;
+
+    /**
      * @var \Spotman\Acl\AclUserInterface
      */
     private $currentUser;
@@ -61,6 +68,7 @@ class Acl implements AclInterface
     public function __construct(AclInitializerInterface $initializer, AclUserInterface $user, CacheProvider $cache)
     {
         // Fetch objects from initializer
+        $this->accessResolver                = $initializer->getDefaultAccessResolver();
         $this->rolesCollector                = $initializer->getRolesCollector();
         $this->resourceFactory               = $initializer->getResourceFactory();
         $this->resourcesCollector            = $initializer->getResourcesCollector();
@@ -181,17 +189,20 @@ class Acl implements AclInterface
         if (!$this->acl->hasResource($identity)) {
             $resource = $this->resourceFactory->createResource($identity);
             $this->addResource($resource);
-
-            return $resource;
+        } else {
+            $resource = $this->acl->getResource($identity);
         }
-
-        $resource = $this->acl->getResource($identity);
 
         if (!($resource instanceof ResourceInterface)) {
             throw new Exception('Resource :name must implement :must', [
                 ':name' => $identity,
                 ':must' => ResourceInterface::class,
             ]);
+        }
+
+        if ($resource instanceof ResolvingResourceInterface) {
+            // Inject AccessResolver in restored resources
+            $resource->useResolver($this->accessResolver);
         }
 
         return $resource;

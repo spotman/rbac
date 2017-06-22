@@ -1,14 +1,20 @@
 <?php
 namespace Spotman\Acl\Initializer;
 
-use Spotman\Acl\RulesCollector\AclRulesCollectorInterface;
+use Spotman\Acl\AccessResolver\AclAccessResolverInterface;
 use Spotman\Acl\ResourceFactory\AclResourceFactoryInterface;
 use Spotman\Acl\ResourceRulesCollectorFactory\AclResourceRulesCollectorFactoryInterface;
 use Spotman\Acl\ResourcesCollector\AclResourcesCollectorInterface;
 use Spotman\Acl\RolesCollector\AclRolesCollectorInterface;
+use Spotman\Acl\RulesCollector\AclRulesCollectorInterface;
 
 class GenericAclInitializer implements AclInitializerInterface
 {
+    /**
+     * @var AclAccessResolverInterface
+     */
+    private $accessResolver;
+
     /**
      * @var AclRolesCollectorInterface
      */
@@ -37,6 +43,7 @@ class GenericAclInitializer implements AclInitializerInterface
     /**
      * GenericAclInitializer constructor.
      *
+     * @param \Spotman\Acl\AccessResolver\AclAccessResolverInterface         $accessResolver
      * @param \Spotman\Acl\ResourceFactory\AclResourceFactoryInterface       $resourceFactory
      * @param \Spotman\Acl\RolesCollector\AclRolesCollectorInterface         $rolesCollector
      * @param \Spotman\Acl\ResourcesCollector\AclResourcesCollectorInterface $resourcesCollector
@@ -44,13 +51,14 @@ class GenericAclInitializer implements AclInitializerInterface
      * @param AclResourceRulesCollectorFactoryInterface                      $ResourceRulesCollectorFactory
      */
     public function __construct(
+        AclAccessResolverInterface $accessResolver,
         AclResourceFactoryInterface $resourceFactory,
         AclRolesCollectorInterface $rolesCollector,
         AclResourcesCollectorInterface $resourcesCollector,
         AclRulesCollectorInterface $permissionsCollector,
         AclResourceRulesCollectorFactoryInterface $ResourceRulesCollectorFactory
-    )
-    {
+    ) {
+        $this->accessResolver                = $accessResolver;
         $this->resourceFactory               = $resourceFactory;
         $this->rolesCollector                = $rolesCollector;
         $this->resourcesCollector            = $resourcesCollector;
@@ -59,42 +67,44 @@ class GenericAclInitializer implements AclInitializerInterface
     }
 
     /**
+     * @return \Spotman\Acl\AccessResolver\AclAccessResolverInterface
+     */
+    public function getDefaultAccessResolver(): AclAccessResolverInterface {
+        return $this->accessResolver;
+    }
+
+    /**
      * @return \Spotman\Acl\RolesCollector\AclRolesCollectorInterface
      */
-    public function getRolesCollector()
-    {
+    public function getRolesCollector() {
         return $this->rolesCollector;
     }
 
     /**
      * @return \Spotman\Acl\ResourcesCollector\AclResourcesCollectorInterface
      */
-    public function getResourcesCollector()
-    {
+    public function getResourcesCollector() {
         return $this->resourcesCollector;
     }
 
     /**
      * @return \Spotman\Acl\RulesCollector\AclRulesCollectorInterface
      */
-    public function getPermissionsCollector()
-    {
+    public function getPermissionsCollector() {
         return $this->permissionsCollector;
     }
 
     /**
      * @return \Spotman\Acl\ResourceFactory\AclResourceFactoryInterface
      */
-    public function getResourceFactory()
-    {
+    public function getResourceFactory() {
         return $this->resourceFactory;
     }
 
     /**
      * @return \Spotman\Acl\ResourceRulesCollectorFactory\AclResourceRulesCollectorFactoryInterface
      */
-    public function getResourceRulesCollectorFactory()
-    {
+    public function getResourceRulesCollectorFactory() {
         return $this->resourceRulesCollectorFactory;
     }
 }

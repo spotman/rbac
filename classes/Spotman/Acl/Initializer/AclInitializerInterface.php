@@ -1,6 +1,8 @@
 <?php
 namespace Spotman\Acl\Initializer;
 
+use Spotman\Acl\AccessResolver\AclAccessResolverInterface;
+
 interface AclInitializerInterface
 {
     /**
@@ -27,4 +29,9 @@ interface AclInitializerInterface
      * @return \Spotman\Acl\ResourceRulesCollectorFactory\AclResourceRulesCollectorFactoryInterface
      */
     public function getResourceRulesCollectorFactory();
+
+    /**
+     * @return \Spotman\Acl\AccessResolver\AclAccessResolverInterface
+     */
+    public function getDefaultAccessResolver(): AclAccessResolverInterface;
 }
