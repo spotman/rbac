@@ -9,7 +9,6 @@ use Spotman\Acl\RulesCollector\AclRulesCollectorInterface;
 use Spotman\Acl\ResourceFactory\AclResourceFactoryInterface;
 use Spotman\Acl\ResourcesCollector\AclResourcesCollectorInterface;
 use Spotman\Acl\RolesCollector\AclRolesCollectorInterface;
-use Spotman\Acl\AccessResolver\AclAccessResolverInterface;
 
 class Acl implements AclInterface
 {

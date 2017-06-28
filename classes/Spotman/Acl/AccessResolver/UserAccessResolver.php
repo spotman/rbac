@@ -20,11 +20,13 @@ class UserAccessResolver implements AclAccessResolverInterface
     /**
      * UserAccessResolver constructor.
      *
-     * @param \Spotman\Acl\AclInterface $acl
+     * @param \Spotman\Acl\AclInterface     $acl
+     * @param \Spotman\Acl\AclUserInterface $user
      */
-    public function __construct(AclInterface $acl)
+    public function __construct(AclInterface $acl, AclUserInterface $user)
     {
-        $this->setAcl($acl);
+        $this->acl  = $acl;
+        $this->user = $user;
     }
 
     /**
@@ -38,19 +40,8 @@ class UserAccessResolver implements AclAccessResolverInterface
         return $this->acl->isAllowedToUser($resource, $permissionIdentity, $this->user);
     }
 
-    /**
-     * @param \Spotman\Acl\AclInterface $acl
-     */
-    private function setAcl(AclInterface $acl): void
+    public function withUser(AclUserInterface $user): UserAccessResolver
     {
-        $this->acl  = $acl;
-        $this->user = $acl->getCurrentUser(); // Preset current user as default value
-    }
-
-    public function setUser(AclUserInterface $user)
-    {
-        $this->user = $user;
-
-        return $this;
+        return new self($this->acl, $user);
     }
 }
