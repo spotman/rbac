@@ -6,7 +6,7 @@ interface AclUserInterface
     /**
      * @return string
      */
-    public function getAccessControlIdentity();
+    public function getAccessControlIdentity(): string;
 
     /**
      * @return AclRoleInterface[]|\Traversable
