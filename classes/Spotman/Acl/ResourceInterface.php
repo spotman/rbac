@@ -3,6 +3,8 @@ namespace Spotman\Acl;
 
 interface ResourceInterface extends \Zend\Permissions\Acl\Resource\ResourceInterface
 {
+    public const SUFFIX = 'Resource';
+
     /**
      * Returns list of available permission identities
      *

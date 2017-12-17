@@ -12,10 +12,10 @@ class GenericAclResourceFactory implements AclResourceFactoryInterface
      * @return ResourceInterface
      * @throws \Spotman\Acl\Exception
      */
-    public function createResource($identity)
+    public function createResource(string $identity): ResourceInterface
     {
         $ns = "\\Spotman\\Acl\\Resource\\";
-        $className = $ns.ucfirst($identity).'ApiResource';
+        $className = $ns.ucfirst($identity).ResourceInterface::SUFFIX;
 
         if (!class_exists($className)) {
             throw new Exception('Class :name does not exists', [':name' => $className]);

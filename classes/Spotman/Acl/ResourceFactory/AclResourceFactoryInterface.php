@@ -6,9 +6,9 @@ use Spotman\Acl\ResourceInterface;
 interface AclResourceFactoryInterface
 {
     /**
-     * @param string            $identity
+     * @param string $identity
      *
      * @return ResourceInterface
      */
-    public function createResource($identity);
+    public function createResource(string $identity): ResourceInterface;
 }
