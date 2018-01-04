@@ -20,7 +20,7 @@ class GenericAclResourceRulesCollectorFactory implements AclResourceRulesCollect
     public function __construct(NamespaceBasedFactory $factory)
     {
         $this->factory = $factory
-            ->setClassPrefixes('Acl', 'ResourceRulesCollector')
+            ->setClassNamespaces('Acl', 'ResourceRulesCollector')
             ->setClassSuffix('ResourceRulesCollector')
             ->setExpectedInterface(ResourceRulesCollectorInterface::class);
     }
