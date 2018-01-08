@@ -10,7 +10,7 @@ class EmptyAclRolesCollector implements AclRolesCollectorInterface
      *
      * @param \Spotman\Acl\AclInterface $acl
      */
-    public function collectRoles(AclInterface $acl)
+    public function collectRoles(AclInterface $acl): void
     {
         // Empty
     }
