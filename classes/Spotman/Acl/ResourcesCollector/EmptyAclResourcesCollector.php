@@ -10,7 +10,7 @@ class EmptyAclResourcesCollector implements AclResourcesCollectorInterface
      *
      * @param \Spotman\Acl\AclInterface $acl
      */
-    public function collectResources(AclInterface $acl)
+    public function collectResources(AclInterface $acl): void
     {
         // Empty
     }

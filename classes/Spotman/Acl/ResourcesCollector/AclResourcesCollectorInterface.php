@@ -10,7 +10,7 @@ interface AclResourcesCollectorInterface
      *
      * @param \Spotman\Acl\AclInterface $acl
      *
-     * @return
+     * @return void
      */
-    public function collectResources(AclInterface $acl);
+    public function collectResources(AclInterface $acl): void;
 }
