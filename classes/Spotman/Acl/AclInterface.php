@@ -5,8 +5,6 @@ use Psr\Log\LoggerAwareInterface;
 
 interface AclInterface extends LoggerAwareInterface
 {
-    const DI_CACHE_OBJECT_KEY = 'AclCache';
-
     /**
      * @return \Spotman\Acl\AclUserInterface
      */

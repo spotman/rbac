@@ -1,6 +1,5 @@
 <?php
 
-use Doctrine\Common\Cache\ArrayCache;
 use Spotman\Acl\AccessResolver\AclAccessResolverInterface;
 use Spotman\Acl\AccessResolver\UserAccessResolver;
 use Spotman\Acl\Acl;
@@ -8,8 +7,6 @@ use Spotman\Acl\AclInterface;
 use Spotman\Acl\AclUserInterface;
 use Spotman\Acl\Initializer\AclInitializerInterface;
 use Spotman\Acl\Initializer\GenericAclInitializer;
-use Spotman\Acl\RulesCollector\AclRulesCollectorInterface;
-use Spotman\Acl\RulesCollector\EmptyAclRulesCollector;
 use Spotman\Acl\ResourceFactory\AclResourceFactoryInterface;
 use Spotman\Acl\ResourceFactory\GenericAclResourceFactory;
 use Spotman\Acl\ResourceRulesCollectorFactory\AclResourceRulesCollectorFactoryInterface;
@@ -18,35 +15,18 @@ use Spotman\Acl\ResourcesCollector\AclResourcesCollectorInterface;
 use Spotman\Acl\ResourcesCollector\EmptyAclResourcesCollector;
 use Spotman\Acl\RolesCollector\AclRolesCollectorInterface;
 use Spotman\Acl\RolesCollector\EmptyAclRolesCollector;
+use Spotman\Acl\RulesCollector\AclRulesCollectorInterface;
+use Spotman\Acl\RulesCollector\EmptyAclRulesCollector;
 
 return [
 
     'definitions' => [
 
         // Lazy Acl binding (prevents circular dependencies)
-        AclInterface::class                              => DI\object(Acl::class)
-            ->constructorParameter('cache', DI\get(AclInterface::DI_CACHE_OBJECT_KEY))
-            ->lazy(),
-
-//        // Acl facade
-//        Acl::class => DI\factory(function (
-//            ContainerInterface $container,
-//            AclInitializerInterface $initializer,
-//            AclUserInterface $user,
-//            LoggerInterface $logger
-//        ) {
-//            $cache = $container->get(AclInterface::DI_CACHE_OBJECT_KEY);
-//
-//            $acl = new Acl($initializer, $user, $cache);
-//            $acl->setLogger($logger);
-//            return $acl;
-//        })->scope(\DI\Scope::SINGLETON),
+        AclInterface::class                              => DI\object(Acl::class)->lazy(),
 
         // Current user
         AclUserInterface::class                          => DI\get('User'),
-
-        // Cache (using Doctrine`s ArrayCache as default)
-        AclInterface::DI_CACHE_OBJECT_KEY                => DI\object(ArrayCache::class),
 
         // Basic initializer for DI containers with autowiring ("Lazy initialization" pattern)
         AclInitializerInterface::class                   => DI\object(GenericAclInitializer::class)->lazy(),

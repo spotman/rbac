@@ -1,14 +1,14 @@
 <?php
 namespace Spotman\Acl;
 
-use Doctrine\Common\Cache\CacheProvider;
+use Doctrine\Common\Cache\Cache;
 use Psr\Log\LoggerInterface;
 use Spotman\Acl\Initializer\AclInitializerInterface;
 use Spotman\Acl\Resource\ResolvingResourceInterface;
-use Spotman\Acl\RulesCollector\AclRulesCollectorInterface;
 use Spotman\Acl\ResourceFactory\AclResourceFactoryInterface;
 use Spotman\Acl\ResourcesCollector\AclResourcesCollectorInterface;
 use Spotman\Acl\RolesCollector\AclRolesCollectorInterface;
+use Spotman\Acl\RulesCollector\AclRulesCollectorInterface;
 
 class Acl implements AclInterface
 {
@@ -42,7 +42,7 @@ class Acl implements AclInterface
     /**
      * @var \Spotman\Acl\ResourceRulesCollectorFactory\AclResourceRulesCollectorFactoryInterface
      */
-    private $resourceRulesCollectorFactory;
+    private $rulesCollectorFactory;
 
     /**
      * @var AclResourceFactoryInterface
@@ -60,24 +60,31 @@ class Acl implements AclInterface
     private $currentUser;
 
     /**
-     * @var CacheProvider
+     * @var Cache
      */
     private $cache;
 
-    public function __construct(AclInitializerInterface $initializer, AclUserInterface $user, CacheProvider $cache)
+    /**
+     * Acl constructor.
+     *
+     * @param \Spotman\Acl\Initializer\AclInitializerInterface $initializer
+     * @param \Spotman\Acl\AclUserInterface                    $user
+     * @param \Doctrine\Common\Cache\Cache                     $cache
+     *
+     * @throws \Spotman\Acl\Exception
+     */
+    public function __construct(AclInitializerInterface $initializer, AclUserInterface $user, Cache $cache)
     {
         // Fetch objects from initializer
-        $this->accessResolver                = $initializer->getDefaultAccessResolver();
-        $this->rolesCollector                = $initializer->getRolesCollector();
-        $this->resourceFactory               = $initializer->getResourceFactory();
-        $this->resourcesCollector            = $initializer->getResourcesCollector();
-        $this->permissionsCollector          = $initializer->getPermissionsCollector();
-        $this->resourceRulesCollectorFactory = $initializer->getResourceRulesCollectorFactory();
+        $this->accessResolver        = $initializer->getDefaultAccessResolver();
+        $this->rolesCollector        = $initializer->getRolesCollector();
+        $this->resourceFactory       = $initializer->getResourceFactory();
+        $this->resourcesCollector    = $initializer->getResourcesCollector();
+        $this->permissionsCollector  = $initializer->getPermissionsCollector();
+        $this->rulesCollectorFactory = $initializer->getResourceRulesCollectorFactory();
 
         $this->currentUser = $user;
-
-        $this->cache = $cache;
-        $this->cache->setNamespace($this->getCacheNamespace());
+        $this->cache       = $cache;
 
         $this->init();
     }
@@ -96,6 +103,8 @@ class Acl implements AclInterface
 
     /**
      * Must be called in factory after object creation coz there is circular dependencies Acl::init() => collect resources => AclAccessResolverInterface => Acl => Acl::init
+     *
+     * @throws \Spotman\Acl\Exception
      */
     private function init(): void
     {
@@ -104,10 +113,7 @@ class Acl implements AclInterface
         }
 
         // Try to load cached data first
-        if ($cachedData = $this->getCachedData()) {
-            $this->logger && $this->logger->debug('Loading Acl from cached data');
-            $this->restoreFromCacheData($cachedData);
-
+        if ($this->restoreFromCacheData()) {
             return;
         }
 
@@ -141,6 +147,7 @@ class Acl implements AclInterface
      * @param \Spotman\Acl\ResourceInterface|string|null $parentResource
      *
      * @return \Spotman\Acl\AclInterface
+     * @throws \Zend\Permissions\Acl\Exception\InvalidArgumentException
      */
     public function addResource($resource, $parentResource = null): AclInterface
     {
@@ -160,7 +167,7 @@ class Acl implements AclInterface
         // Use custom permissions collector for current resource
         if ($resource->isCustomRulesCollectorUsed()) {
             /** @var AclRulesCollectorInterface $collectorInstance */
-            $collectorInstance = $this->resourceRulesCollectorFactory->createCollector($resource);
+            $collectorInstance = $this->rulesCollectorFactory->createCollector($resource);
 
             $collectorInstance->collectPermissions($this);
         }
@@ -182,6 +189,8 @@ class Acl implements AclInterface
      * @param string $identity
      *
      * @return \Spotman\Acl\ResourceInterface
+     * @throws \Zend\Permissions\Acl\Exception\InvalidArgumentException
+     * @throws \Spotman\Acl\Exception
      */
     public function getResource(string $identity): ResourceInterface
     {
@@ -212,6 +221,7 @@ class Acl implements AclInterface
      * @param array|null $parentRolesIdentities
      *
      * @return \Spotman\Acl\AclInterface
+     * @throws \Zend\Permissions\Acl\Exception\InvalidArgumentException
      */
     public function addRole(string $roleIdentity, array $parentRolesIdentities = null): AclInterface
     {
@@ -238,8 +248,12 @@ class Acl implements AclInterface
      * @param string|null $permissionIdentity
      * @param string|null $bindToResourceIdentity
      */
-    public function addAllowRule(?string $roleIdentity = null, ?string $resourceIdentity = null, ?string $permissionIdentity = null, ?string $bindToResourceIdentity = null): void
-    {
+    public function addAllowRule(
+        ?string $roleIdentity = null,
+        ?string $resourceIdentity = null,
+        ?string $permissionIdentity = null,
+        ?string $bindToResourceIdentity = null
+    ): void {
         if (!$bindToResourceIdentity) {
             $bindToResourceIdentity = $resourceIdentity;
         }
@@ -255,8 +269,12 @@ class Acl implements AclInterface
      * @param string|null $permissionIdentity
      * @param string|null $bindToResourceIdentity
      */
-    public function removeAllowRule(?string $roleIdentity = null, ?string $resourceIdentity = null, ?string $permissionIdentity = null, ?string $bindToResourceIdentity = null): void
-    {
+    public function removeAllowRule(
+        ?string $roleIdentity = null,
+        ?string $resourceIdentity = null,
+        ?string $permissionIdentity = null,
+        ?string $bindToResourceIdentity = null
+    ): void {
         if (!$bindToResourceIdentity) {
             $bindToResourceIdentity = $resourceIdentity;
         }
@@ -272,8 +290,12 @@ class Acl implements AclInterface
      * @param string|null $permissionIdentity
      * @param string|null $bindToResourceIdentity
      */
-    public function addDenyRule(?string $roleIdentity = null, ?string $resourceIdentity = null, ?string $permissionIdentity = null, ?string $bindToResourceIdentity = null): void
-    {
+    public function addDenyRule(
+        ?string $roleIdentity = null,
+        ?string $resourceIdentity = null,
+        ?string $permissionIdentity = null,
+        ?string $bindToResourceIdentity = null
+    ): void {
         if (!$bindToResourceIdentity) {
             $bindToResourceIdentity = $resourceIdentity;
         }
@@ -289,8 +311,12 @@ class Acl implements AclInterface
      * @param string|null $permissionIdentity
      * @param string|null $bindToResourceIdentity
      */
-    public function removeDenyRule(?string $roleIdentity = null, ?string $resourceIdentity = null, ?string $permissionIdentity = null, ?string $bindToResourceIdentity = null): void
-    {
+    public function removeDenyRule(
+        ?string $roleIdentity = null,
+        ?string $resourceIdentity = null,
+        ?string $permissionIdentity = null,
+        ?string $bindToResourceIdentity = null
+    ): void {
         if (!$bindToResourceIdentity) {
             $bindToResourceIdentity = $resourceIdentity;
         }
@@ -308,9 +334,13 @@ class Acl implements AclInterface
      * @param \Spotman\Acl\AclRoleInterface  $role
      *
      * @return bool
+     * @throws \Zend\Permissions\Acl\Exception\InvalidArgumentException
      */
-    public function isAllowedToRole(ResourceInterface $resource, string $permissionIdentity, AclRoleInterface $role): bool
-    {
+    public function isAllowedToRole(
+        ResourceInterface $resource,
+        string $permissionIdentity,
+        AclRoleInterface $role
+    ): bool {
         // Add missing resource and import it's default permissions
         if (!$this->acl->hasResource($resource)) {
             $this->addResource($resource);
@@ -329,9 +359,13 @@ class Acl implements AclInterface
      * @param \Spotman\Acl\AclUserInterface  $user
      *
      * @return bool
+     * @throws \Zend\Permissions\Acl\Exception\InvalidArgumentException
      */
-    public function isAllowedToUser(ResourceInterface $resource, string $permissionIdentity, AclUserInterface $user): bool
-    {
+    public function isAllowedToUser(
+        ResourceInterface $resource,
+        string $permissionIdentity,
+        AclUserInterface $user
+    ): bool {
         $userRoles = $user->getAccessControlRoles();
 
         foreach ($userRoles as $role) {
@@ -343,6 +377,13 @@ class Acl implements AclInterface
         return false;
     }
 
+    /**
+     * @param \Spotman\Acl\ResourceInterface $resource
+     * @param string                         $permissionIdentity
+     *
+     * @return bool
+     * @throws \Zend\Permissions\Acl\Exception\InvalidArgumentException
+     */
     public function isAllowed(ResourceInterface $resource, string $permissionIdentity): bool
     {
         return $this->isAllowedToUser($resource, $permissionIdentity, $this->currentUser);
@@ -369,15 +410,11 @@ class Acl implements AclInterface
     protected function getCachedData(): ?string
     {
         // Get data from cache
-        return $this->cache ? $this->cache->fetch($this->getCacheKey()) : null;
+        return $this->cache->fetch($this->getCacheKey());
     }
 
     protected function putDataInCache(): bool
     {
-        if (!$this->cache) {
-            return false;
-        }
-
         // Serializing Acl instance
         $data = serialize($this->acl);
 
@@ -386,13 +423,21 @@ class Acl implements AclInterface
     }
 
     /**
-     * @param string $data
+     * @throws \Spotman\Acl\Exception
      */
-    protected function restoreFromCacheData($data): void
+    protected function restoreFromCacheData(): bool
     {
-        if (!is_string($data)) {
-            throw new Exception('Cached data is not a string, :type given', [':type' => gettype($data)]);
+        $data = $this->getCachedData();
+
+        if (!$data) {
+            return false;
         }
+
+        if (!\is_string($data)) {
+            throw new Exception('Cached data is not a string, :type given', [':type' => \gettype($data)]);
+        }
+
+        $this->logger && $this->logger->debug('Loading Acl from cached data');
 
         $this->acl = unserialize($data, [
             \Zend\Permissions\Acl\Acl::class,
@@ -400,13 +445,10 @@ class Acl implements AclInterface
         ]);
 
         if (!($this->acl && $this->acl instanceof \Zend\Permissions\Acl\Acl)) {
-            throw new Exception('Cached data is not an Acl instance, :type given', [':type' => gettype($this->acl)]);
+            throw new Exception('Cached data is not an Acl instance, :type given', [':type' => \gettype($this->acl)]);
         }
-    }
 
-    protected function getCacheNamespace(): string
-    {
-        return 'acl';
+        return true;
     }
 
     protected function getCacheKey(): string
@@ -414,6 +456,6 @@ class Acl implements AclInterface
         $userIdentity = $this->currentUser->getAccessControlIdentity() ?: 'guest';
 
         // Unique key for each user (more space usage but no collisions)
-        return 'acl-user-'.$userIdentity;
+        return 'acl.user-'.$userIdentity;
     }
 }
