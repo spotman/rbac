@@ -23,31 +23,31 @@ return [
     'definitions' => [
 
         // Lazy Acl binding (prevents circular dependencies)
-        AclInterface::class                              => DI\object(Acl::class)->lazy(),
+        AclInterface::class                              => DI\autowire(Acl::class)->lazy(),
 
         // Current user
         AclUserInterface::class                          => DI\get('User'),
 
         // Basic initializer for DI containers with autowiring ("Lazy initialization" pattern)
-        AclInitializerInterface::class                   => DI\object(GenericAclInitializer::class)->lazy(),
+        AclInitializerInterface::class                   => DI\autowire(GenericAclInitializer::class)->lazy(),
 
         // Resolving resources` access relatively to current user
-        AclAccessResolverInterface::class                => DI\object(UserAccessResolver::class)->lazy(),
+        AclAccessResolverInterface::class                => DI\autowire(UserAccessResolver::class)->lazy(),
 
         // No roles by default
-        AclRolesCollectorInterface::class                => DI\object(EmptyAclRolesCollector::class),
+        AclRolesCollectorInterface::class                => DI\autowire(EmptyAclRolesCollector::class),
 
         // No resources by default
-        AclResourcesCollectorInterface::class            => DI\object(EmptyAclResourcesCollector::class),
+        AclResourcesCollectorInterface::class            => DI\autowire(EmptyAclResourcesCollector::class),
 
         // No permissions by default
-        AclRulesCollectorInterface::class                => DI\object(EmptyAclRulesCollector::class),
+        AclRulesCollectorInterface::class                => DI\autowire(EmptyAclRulesCollector::class),
 
         // Simple factory without DI
-        AclResourceFactoryInterface::class               => DI\object(GenericAclResourceFactory::class),
+        AclResourceFactoryInterface::class               => DI\autowire(GenericAclResourceFactory::class),
 
         // Basic factory
-        AclResourceRulesCollectorFactoryInterface::class => DI\object(GenericAclResourceRulesCollectorFactory::class),
+        AclResourceRulesCollectorFactoryInterface::class => DI\autowire(GenericAclResourceRulesCollectorFactory::class),
 
     ],
 
