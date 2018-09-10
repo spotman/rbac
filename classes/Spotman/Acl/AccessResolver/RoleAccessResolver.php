@@ -24,7 +24,7 @@ class RoleAccessResolver implements AclAccessResolverInterface
      */
     public function __construct(AclInterface $acl)
     {
-        $this->setAcl($acl);
+        $this->acl = $acl;
     }
 
     public function setRole(AclRoleInterface $role)
@@ -35,22 +35,12 @@ class RoleAccessResolver implements AclAccessResolverInterface
     }
 
     /**
-     * Stores Acl instance after unserialize
-     *
-     * @param \Spotman\Acl\AclInterface $acl
-     */
-    public function setAcl(AclInterface $acl)
-    {
-        $this->acl = $acl;
-    }
-
-    /**
      * @param \Spotman\Acl\ResourceInterface $resource
      * @param                                $permissionIdentity
      *
      * @return bool
      */
-    public function isAllowed(ResourceInterface $resource, $permissionIdentity)
+    public function isAllowed(ResourceInterface $resource, $permissionIdentity): bool
     {
         return $this->acl->isAllowedToRole($resource, $permissionIdentity, $this->role);
     }
