@@ -11,5 +11,5 @@ interface AclUserInterface
     /**
      * @return AclRoleInterface[]|\Traversable
      */
-    public function getAccessControlRoles();
+    public function getAccessControlRoles(): array;
 }
