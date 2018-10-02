@@ -10,7 +10,7 @@ class EmptyAclRulesCollector implements AclRulesCollectorInterface
      *
      * @param \Spotman\Acl\AclInterface $acl
      */
-    public function collectPermissions(AclInterface $acl)
+    public function collectPermissions(AclInterface $acl): void
     {
         // Empty
     }

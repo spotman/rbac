@@ -9,9 +9,9 @@ interface ResolvingResourceInterface extends ResourceInterface
     /**
      * @param \Spotman\Acl\AccessResolver\AclAccessResolverInterface $resolver
      *
-     * @return $this
+     * @return void
      */
-    public function useResolver(AclAccessResolverInterface $resolver);
+    public function useResolver(AclAccessResolverInterface $resolver): void;
 
     /**
      * @param string $permissionIdentity

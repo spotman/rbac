@@ -14,13 +14,11 @@ abstract class AbstractResolvingResource extends AbstractResource implements Res
     /**
      * @param \Spotman\Acl\AccessResolver\AclAccessResolverInterface $resolver
      *
-     * @return $this
+     * @return void
      */
-    public function useResolver(AclAccessResolverInterface $resolver)
+    public function useResolver(AclAccessResolverInterface $resolver): void
     {
         $this->resolver = $resolver;
-
-        return $this;
     }
 
     /**

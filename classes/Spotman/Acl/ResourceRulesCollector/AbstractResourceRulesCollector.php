@@ -27,11 +27,9 @@ abstract class AbstractResourceRulesCollector implements AclRulesCollectorInterf
      *
      * @param \Spotman\Acl\AclInterface $acl
      */
-    public function collectPermissions(AclInterface $acl)
+    public function collectPermissions(AclInterface $acl): void
     {
-        $pairs = $this->getPermissionsRoles();
-
-        foreach ($pairs as $permissionIdentity => $roles) {
+        foreach ($this->getPermissionsRoles() as $permissionIdentity => $roles) {
             foreach ($roles as $roleIdentity) {
                 $acl->addAllowRule($roleIdentity, $this->resource, $permissionIdentity);
             }
@@ -41,5 +39,5 @@ abstract class AbstractResourceRulesCollector implements AclRulesCollectorInterf
     /**
      * @return array[]
      */
-    abstract protected function getPermissionsRoles();
+    abstract protected function getPermissionsRoles(): array;
 }

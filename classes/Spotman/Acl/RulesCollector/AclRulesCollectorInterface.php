@@ -10,7 +10,7 @@ interface AclRulesCollectorInterface
      *
      * @param \Spotman\Acl\AclInterface $acl
      *
-     * @return
+     * @return void
      */
-    public function collectPermissions(AclInterface $acl);
+    public function collectPermissions(AclInterface $acl): void;
 }
