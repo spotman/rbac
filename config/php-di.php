@@ -23,16 +23,13 @@ return [
     'definitions' => [
 
         // Lazy Acl binding (prevents circular dependencies)
-        AclInterface::class                              => DI\autowire(Acl::class)->lazy(),
+        AclInterface::class                              => DI\autowire(Acl::class),
 
         // Current user
         AclUserInterface::class                          => DI\get('User'),
 
         // Basic initializer for DI containers with autowiring ("Lazy initialization" pattern)
         AclInitializerInterface::class                   => DI\autowire(GenericAclInitializer::class)->lazy(),
-
-        // Resolving resources` access relatively to current user
-        AclAccessResolverInterface::class                => DI\autowire(UserAccessResolver::class)->lazy(),
 
         // No roles by default
         AclRolesCollectorInterface::class                => DI\autowire(EmptyAclRolesCollector::class),
