@@ -4,5 +4,4 @@
  * Automatically generated from previous translation file.
  */
 return array (
-  'Acl' => 'Acl',
 );
