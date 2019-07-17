@@ -2,6 +2,7 @@
 namespace Spotman\Acl\ResourceRulesCollectorFactory;
 
 use Spotman\Acl\ResourceInterface;
+use Spotman\Acl\ResourceRulesCollector\ResourceRulesCollectorInterface;
 
 interface AclResourceRulesCollectorFactoryInterface
 {
@@ -10,5 +11,5 @@ interface AclResourceRulesCollectorFactoryInterface
      *
      * @return \Spotman\Acl\ResourceRulesCollector\ResourceRulesCollectorInterface
      */
-    public function createCollector(ResourceInterface $resource);
+    public function createCollector(ResourceInterface $resource): ResourceRulesCollectorInterface;
 }

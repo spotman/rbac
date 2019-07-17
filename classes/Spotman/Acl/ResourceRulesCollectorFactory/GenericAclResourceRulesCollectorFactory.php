@@ -36,8 +36,6 @@ class GenericAclResourceRulesCollectorFactory implements AclResourceRulesCollect
     {
         $collectorName = $resource->getResourceId();
 
-        return $this->factory->create($collectorName, [
-            'resource' => $resource,
-        ]);
+        return $this->factory->create($collectorName);
     }
 }

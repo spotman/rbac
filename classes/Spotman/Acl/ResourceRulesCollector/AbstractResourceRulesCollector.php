@@ -2,42 +2,29 @@
 namespace Spotman\Acl\ResourceRulesCollector;
 
 use Spotman\Acl\AclInterface;
-use Spotman\Acl\RulesCollector\AclRulesCollectorInterface;
 use Spotman\Acl\ResourceInterface;
 
-abstract class AbstractResourceRulesCollector implements AclRulesCollectorInterface
+abstract class AbstractResourceRulesCollector implements ResourceRulesCollectorInterface
 {
-    /**
-     * @var \Spotman\Acl\ResourceInterface
-     */
-    protected $resource;
-
-    /**
-     * AbstractResourceRulesCollector constructor.
-     *
-     * @param \Spotman\Acl\ResourceInterface $resource
-     */
-    public function __construct(ResourceInterface $resource)
-    {
-        $this->resource = $resource;
-    }
-
     /**
      * Collect entities from external source and add them to acl via protected methods addAllowRule / addDenyRule
      *
-     * @param \Spotman\Acl\AclInterface $acl
+     * @param \Spotman\Acl\ResourceInterface $resource
+     * @param \Spotman\Acl\AclInterface      $acl
      */
-    public function collectPermissions(AclInterface $acl): void
+    public function collectResourcePermissions(ResourceInterface $resource, AclInterface $acl): void
     {
-        foreach ($this->getPermissionsRoles() as $permissionIdentity => $roles) {
+        foreach ($this->getPermissionsRoles($resource) as $permissionIdentity => $roles) {
             foreach ($roles as $roleIdentity) {
-                $acl->addAllowRule($roleIdentity, $this->resource, $permissionIdentity);
+                $acl->addAllowRule($roleIdentity, $resource, $permissionIdentity);
             }
         }
     }
 
     /**
+     * @param \Spotman\Acl\ResourceInterface $resource
+     *
      * @return array[]
      */
-    abstract protected function getPermissionsRoles(): array;
+    abstract protected function getPermissionsRoles(ResourceInterface $resource): array;
 }

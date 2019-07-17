@@ -148,7 +148,7 @@ class Acl implements AclInterface
         if ($resource->isCustomRulesCollectorUsed()) {
             $collectorInstance = $this->rulesCollectorFactory->createCollector($resource);
 
-            $collectorInstance->collectPermissions($this);
+            $collectorInstance->collectResourcePermissions($resource, $this);
         }
 
         return $this;
