@@ -222,9 +222,15 @@ class Acl implements AclInterface
             $bindToResourceIdentity = $resourceIdentity;
         }
 
-        $permissionIdentity = $this->makeCompoundPermissionIdentity($resourceIdentity, $permissionIdentity);
+//        $permissionIdentity = $this->makeCompoundPermissionIdentity($resourceIdentity, $permissionIdentity);
 
         $this->acl->allow($roleIdentity, $bindToResourceIdentity, $permissionIdentity);
+
+        $this->logger && $this->logger->debug(':resource.:permission is allowed to ":role"', [
+            ':resource'   => $resourceIdentity,
+            ':permission' => $permissionIdentity,
+            ':role'       => $roleIdentity,
+        ]);
     }
 
     /**
@@ -243,7 +249,7 @@ class Acl implements AclInterface
             $bindToResourceIdentity = $resourceIdentity;
         }
 
-        $permissionIdentity = $this->makeCompoundPermissionIdentity($resourceIdentity, $permissionIdentity);
+//        $permissionIdentity = $this->makeCompoundPermissionIdentity($resourceIdentity, $permissionIdentity);
 
         $this->acl->removeAllow($roleIdentity, $bindToResourceIdentity, $permissionIdentity);
     }
@@ -264,9 +270,15 @@ class Acl implements AclInterface
             $bindToResourceIdentity = $resourceIdentity;
         }
 
-        $permissionIdentity = $this->makeCompoundPermissionIdentity($resourceIdentity, $permissionIdentity);
+//        $permissionIdentity = $this->makeCompoundPermissionIdentity($resourceIdentity, $permissionIdentity);
 
         $this->acl->deny($roleIdentity, $bindToResourceIdentity, $permissionIdentity);
+
+        $this->logger && $this->logger->debug(':resource.:permission is denied to ":role"', [
+            ':resource'   => $resourceIdentity,
+            ':permission' => $permissionIdentity,
+            ':role'       => $roleIdentity,
+        ]);
     }
 
     /**
@@ -285,7 +297,7 @@ class Acl implements AclInterface
             $bindToResourceIdentity = $resourceIdentity;
         }
 
-        $permissionIdentity = $this->makeCompoundPermissionIdentity($resourceIdentity, $permissionIdentity);
+//        $permissionIdentity = $this->makeCompoundPermissionIdentity($resourceIdentity, $permissionIdentity);
 
         $this->acl->removeDeny($roleIdentity, $bindToResourceIdentity, $permissionIdentity);
     }
@@ -312,9 +324,18 @@ class Acl implements AclInterface
             $this->addResource($resourceIdentity);
         }
 
-        $permissionIdentity = $this->makeCompoundPermissionIdentity($resource->getResourceId(), $permissionIdentity);
+//        $permissionIdentity = $this->makeCompoundPermissionIdentity($resource->getResourceId(), $permissionIdentity);
 
-        return $this->acl->isAllowed($role, $resource, $permissionIdentity);
+        $result = $this->acl->isAllowed($role, $resource, $permissionIdentity);
+
+        $this->logger && $this->logger->debug(':result :resource.:permission to ":role"', [
+            ':resource'   => $resourceIdentity,
+            ':permission' => $permissionIdentity,
+            ':role'       => $role->getRoleId(),
+            ':result'     => $result ? 'ALLOWED' : 'DENIED',
+        ]);
+
+        return $result;
     }
 
     /**
@@ -368,20 +389,20 @@ class Acl implements AclInterface
         return $resource;
     }
 
-    /**
-     * @param string|null $resourceIdentity
-     * @param string|null $permissionIdentity
-     *
-     * @return null|string
-     */
-    protected function makeCompoundPermissionIdentity($resourceIdentity = null, $permissionIdentity = null): ?string
-    {
-        if ($permissionIdentity === null || $resourceIdentity === null) {
-            return $permissionIdentity;
-        }
-
-        return $resourceIdentity.'.'.$permissionIdentity;
-    }
+//    /**
+//     * @param string|null $resourceIdentity
+//     * @param string|null $permissionIdentity
+//     *
+//     * @return null|string
+//     */
+//    protected function makeCompoundPermissionIdentity($resourceIdentity = null, $permissionIdentity = null): ?string
+//    {
+//        if ($permissionIdentity === null || $resourceIdentity === null) {
+//            return $permissionIdentity;
+//        }
+//
+//        return $resourceIdentity.'.'.$permissionIdentity;
+//    }
 
     /**
      * @return string|null
