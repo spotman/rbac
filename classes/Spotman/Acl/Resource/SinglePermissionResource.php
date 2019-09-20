@@ -3,7 +3,7 @@ namespace Spotman\Acl\Resource;
 
 abstract class SinglePermissionResource extends AbstractResolvingResource
 {
-    const PERMISSION_IDENTITY = 'enabled';
+    protected const PERMISSION_IDENTITY = 'enabled';
 
     public function isEnabled(): bool
     {
