@@ -62,7 +62,7 @@ class Acl implements AclInterface
      * @param \Spotman\Acl\Initializer\AclInitializerInterface $initializer
      * @param \Doctrine\Common\Cache\Cache                     $cache
      *
-     * @throws \Spotman\Acl\Exception
+     * @throws \Spotman\Acl\AclException
      */
     public function __construct(AclInitializerInterface $initializer, Cache $cache)
     {
@@ -93,7 +93,7 @@ class Acl implements AclInterface
     /**
      * Must be called in factory after object creation coz there is circular dependencies Acl::init() => collect resources => AclAccessResolverInterface => Acl => Acl::init
      *
-     * @throws \Spotman\Acl\Exception
+     * @throws \Spotman\Acl\AclException
      */
     private function init(): void
     {
@@ -169,7 +169,7 @@ class Acl implements AclInterface
      *
      * @return \Spotman\Acl\ResourceInterface
      * @throws \Zend\Permissions\Acl\Exception\InvalidArgumentException
-     * @throws \Spotman\Acl\Exception
+     * @throws \Spotman\Acl\AclException
      */
     public function getResource(string $identity): ResourceInterface
     {
@@ -380,7 +380,7 @@ class Acl implements AclInterface
         $resource = $this->resourceFactory->createResource($identity);
 
         if (!($resource instanceof ResourceInterface)) {
-            throw new Exception('Resource :name must implement :must', [
+            throw new AclException('Resource :name must implement :must', [
                 ':name' => $identity,
                 ':must' => ResourceInterface::class,
             ]);
@@ -423,7 +423,7 @@ class Acl implements AclInterface
     }
 
     /**
-     * @throws \Spotman\Acl\Exception
+     * @throws \Spotman\Acl\AclException
      */
     protected function restoreFromCacheData(): bool
     {
@@ -434,7 +434,7 @@ class Acl implements AclInterface
         }
 
         if (!\is_string($data)) {
-            throw new Exception('Cached data is not a string, :type given', [':type' => \gettype($data)]);
+            throw new AclException('Cached data is not a string, :type given', [':type' => \gettype($data)]);
         }
 
         $this->logger && $this->logger->debug('Loading Acl from cached data');
@@ -444,7 +444,7 @@ class Acl implements AclInterface
         ]);
 
         if (!($this->acl && $this->acl instanceof ZendAcl)) {
-            throw new Exception('Cached data is not an Acl instance, :type given', [
+            throw new AclException('Cached data is not an Acl instance, :type given', [
                 ':type' => \gettype($this->acl),
             ]);
         }

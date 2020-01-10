@@ -1,7 +1,7 @@
 <?php
 namespace Spotman\Acl;
 
-class Exception extends \Exception
+class AclException extends \Exception
 {
     public function __construct($message = '', array $variables = NULL, $code = 0, \Throwable $previous = NULL)
     {
