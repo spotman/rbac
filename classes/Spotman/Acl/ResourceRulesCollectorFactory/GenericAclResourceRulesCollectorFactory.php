@@ -1,23 +1,26 @@
 <?php
 namespace Spotman\Acl\ResourceRulesCollectorFactory;
 
-use BetaKiller\Factory\NamespaceBasedFactoryBuilder;
+use BetaKiller\Factory\NamespaceBasedFactoryBuilderInterface;
+use BetaKiller\Factory\NamespaceBasedFactoryInterface;
 use Spotman\Acl\ResourceInterface;
 use Spotman\Acl\ResourceRulesCollector\ResourceRulesCollectorInterface;
 
 class GenericAclResourceRulesCollectorFactory implements AclResourceRulesCollectorFactoryInterface
 {
     /**
-     * @var \BetaKiller\Factory\NamespaceBasedFactory
+     * @var \BetaKiller\Factory\NamespaceBasedFactoryInterface
      */
-    private $factory;
+    private NamespaceBasedFactoryInterface $factory;
 
     /**
      * GenericAclResourceRulesCollectorFactory constructor.
      *
-     * @param \BetaKiller\Factory\NamespaceBasedFactoryBuilder $factoryBuilder
+     * @param \BetaKiller\Factory\NamespaceBasedFactoryBuilderInterface $factoryBuilder
+     *
+     * @throws \BetaKiller\Factory\FactoryException
      */
-    public function __construct(NamespaceBasedFactoryBuilder $factoryBuilder)
+    public function __construct(NamespaceBasedFactoryBuilderInterface $factoryBuilder)
     {
         $this->factory = $factoryBuilder
             ->createFactory()
