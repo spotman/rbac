@@ -227,9 +227,9 @@ class Acl implements AclInterface
         $this->acl->allow($roleIdentity, $bindToResourceIdentity, $permissionIdentity);
 
         $this->logger && $this->logger->debug(':resource.:permission is allowed to ":role"', [
-            ':resource'   => $resourceIdentity,
-            ':permission' => $permissionIdentity,
-            ':role'       => $roleIdentity,
+            ':resource'   => $resourceIdentity ?? 'any',
+            ':permission' => $permissionIdentity ?? 'any',
+            ':role'       => $roleIdentity ?? 'any',
         ]);
     }
 
