@@ -3,6 +3,7 @@ namespace Spotman\Acl;
 
 use Psr\Log\LoggerInterface;
 use Spotman\Acl\Resource\ResolvingResourceInterface;
+use Zend\Permissions\Acl\Role\RoleInterface;
 
 interface AclInterface
 {
@@ -131,6 +132,46 @@ interface AclInterface
         string $permissionIdentity,
         AclUserInterface $user
     ): bool;
+
+    /**
+     * Returns true if User has assigned role
+     *
+     * @param \Spotman\Acl\AclUserInterface            $user
+     * @param \Zend\Permissions\Acl\Role\RoleInterface $role
+     *
+     * @return bool
+     */
+    public function hasAssignedRole(AclUserInterface $user, RoleInterface $role): bool;
+
+    /**
+     * Returns true if User has assigned any of provided roles
+     *
+     * @param \Spotman\Acl\AclUserInterface $user
+     * @param RoleInterface[]               $roles
+     *
+     * @return bool
+     */
+    public function hasAnyAssignedRole(AclUserInterface $user, array $roles): bool;
+
+    /**
+     * Returns true if User has assigned Role
+     *
+     * @param \Spotman\Acl\AclUserInterface $user
+     * @param string                        $roleId
+     *
+     * @return bool
+     */
+    public function hasAssignedRoleName(AclUserInterface $user, string $roleId): bool;
+
+    /**
+     * Returns true if User has assigned any of provided roles
+     *
+     * @param \Spotman\Acl\AclUserInterface $user
+     * @param string[]                      $roles
+     *
+     * @return bool
+     */
+    public function hasAnyAssignedRoleName(AclUserInterface $user, array $roles): bool;
 
     /**
      * Inject UserAccessResolver into resource

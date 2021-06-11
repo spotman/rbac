@@ -11,50 +11,51 @@ use Spotman\Acl\ResourcesCollector\AclResourcesCollectorInterface;
 use Spotman\Acl\RolesCollector\AclRolesCollectorInterface;
 use Spotman\Acl\RulesCollector\AclRulesCollectorInterface;
 use Zend\Permissions\Acl\Acl as ZendAcl;
+use Zend\Permissions\Acl\Role\RoleInterface;
 
 class Acl implements AclInterface
 {
-    private $initialized = false;
+    private bool $initialized = false;
 
     /**
-     * @var \Psr\Log\LoggerInterface
+     * @var \Psr\Log\LoggerInterface|null
      */
-    private $logger;
+    private ?LoggerInterface $logger = null;
 
     /**
      * @var \Zend\Permissions\Acl\Acl
      */
-    private $acl;
+    private ZendAcl $acl;
 
     /**
      * @var AclResourcesCollectorInterface
      */
-    private $resourcesCollector;
+    private AclResourcesCollectorInterface $resourcesCollector;
 
     /**
      * @var AclRolesCollectorInterface
      */
-    private $rolesCollector;
+    private AclRolesCollectorInterface $rolesCollector;
 
     /**
      * @var AclRulesCollectorInterface
      */
-    private $permissionsCollector;
+    private AclRulesCollectorInterface $permissionsCollector;
 
     /**
      * @var \Spotman\Acl\ResourceRulesCollectorFactory\AclResourceRulesCollectorFactoryInterface
      */
-    private $rulesCollectorFactory;
+    private ResourceRulesCollectorFactory\AclResourceRulesCollectorFactoryInterface $rulesCollectorFactory;
 
     /**
      * @var AclResourceFactoryInterface
      */
-    private $resourceFactory;
+    private AclResourceFactoryInterface $resourceFactory;
 
     /**
      * @var Cache
      */
-    private $cache;
+    private Cache $cache;
 
     /**
      * Acl constructor.
@@ -355,6 +356,62 @@ class Acl implements AclInterface
     ): bool {
         foreach ($user->getAccessControlRoles() as $role) {
             if ($this->isAllowedToRole($resource, $permissionIdentity, $role)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function hasAssignedRole(AclUserInterface $user, RoleInterface $role): bool
+    {
+        foreach ($user->getAccessControlRoles() as $userRole) {
+            if ($userRole->getRoleId() === $role->getRoleId()) {
+                return true;
+            }
+
+            if ($this->acl->inheritsRole($userRole, $role)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function hasAnyAssignedRole(AclUserInterface $user, array $roles): bool
+    {
+        foreach ($roles as $role) {
+            if ($this->hasAssignedRole($user, $role)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function hasAssignedRoleName(AclUserInterface $user, string $roleId): bool
+    {
+        $role = $this->acl->getRole($roleId);
+
+        return $this->hasAssignedRole($user, $role);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function hasAnyAssignedRoleName(AclUserInterface $user, array $roles): bool
+    {
+        foreach ($roles as $role) {
+            if ($this->hasAssignedRoleName($user, $role)) {
                 return true;
             }
         }
