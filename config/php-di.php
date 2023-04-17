@@ -1,7 +1,5 @@
 <?php
 
-use Spotman\Acl\AccessResolver\AclAccessResolverInterface;
-use Spotman\Acl\AccessResolver\UserAccessResolver;
 use Spotman\Acl\Acl;
 use Spotman\Acl\AclInterface;
 use Spotman\Acl\AclUserInterface;
@@ -28,8 +26,8 @@ return [
         // Current user
         AclUserInterface::class                          => DI\get('User'),
 
-        // Basic initializer for DI containers with autowiring ("Lazy initialization" pattern)
-        AclInitializerInterface::class                   => DI\autowire(GenericAclInitializer::class)->lazy(),
+        // Basic initializer for DI containers with autowiring
+        AclInitializerInterface::class                   => DI\autowire(GenericAclInitializer::class), /*->lazy()*/
 
         // No roles by default
         AclRolesCollectorInterface::class                => DI\autowire(EmptyAclRolesCollector::class),
