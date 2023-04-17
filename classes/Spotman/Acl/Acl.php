@@ -1,8 +1,8 @@
 <?php
 namespace Spotman\Acl;
 
-use Doctrine\Common\Cache\Cache;
 use Psr\Log\LoggerInterface;
+use Psr\SimpleCache\CacheInterface;
 use Spotman\Acl\AccessResolver\UserAccessResolver;
 use Spotman\Acl\Initializer\AclInitializerInterface;
 use Spotman\Acl\Resource\ResolvingResourceInterface;
@@ -53,19 +53,19 @@ class Acl implements AclInterface
     private AclResourceFactoryInterface $resourceFactory;
 
     /**
-     * @var Cache
+     * @var \Psr\SimpleCache\CacheInterface
      */
-    private Cache $cache;
+    private CacheInterface $cache;
 
     /**
      * Acl constructor.
      *
      * @param \Spotman\Acl\Initializer\AclInitializerInterface $initializer
-     * @param \Doctrine\Common\Cache\Cache                     $cache
+     * @param \Psr\SimpleCache\CacheInterface                  $cache
      *
      * @throws \Spotman\Acl\AclException
      */
-    public function __construct(AclInitializerInterface $initializer, Cache $cache)
+    public function __construct(AclInitializerInterface $initializer, CacheInterface $cache)
     {
         // Fetch objects from initializer
         $this->rolesCollector        = $initializer->getRolesCollector();
@@ -158,7 +158,6 @@ class Acl implements AclInterface
     private function importResourceDefaultPermissions(ResourceInterface $resource): void
     {
         foreach ($resource->getDefaultAccessList() as $permissionIdentity => $roles) {
-            /** @var string[] $roles */
             foreach ($roles as $role) {
                 $this->addAllowRule($role, $resource->getResourceId(), $permissionIdentity);
             }
@@ -298,8 +297,6 @@ class Acl implements AclInterface
             $bindToResourceIdentity = $resourceIdentity;
         }
 
-//        $permissionIdentity = $this->makeCompoundPermissionIdentity($resourceIdentity, $permissionIdentity);
-
         $this->acl->removeDeny($roleIdentity, $bindToResourceIdentity, $permissionIdentity);
     }
 
@@ -307,11 +304,10 @@ class Acl implements AclInterface
      * Check for raw permission name
      *
      * @param \Spotman\Acl\ResourceInterface $resource
-     * @param string|null                    $permissionIdentity
+     * @param string                         $permissionIdentity
      * @param \Spotman\Acl\AclRoleInterface  $role
      *
      * @return bool
-     * @throws \Zend\Permissions\Acl\Exception\InvalidArgumentException
      */
     public function isAllowedToRole(
         ResourceInterface $resource,
@@ -446,28 +442,13 @@ class Acl implements AclInterface
         return $resource;
     }
 
-//    /**
-//     * @param string|null $resourceIdentity
-//     * @param string|null $permissionIdentity
-//     *
-//     * @return null|string
-//     */
-//    protected function makeCompoundPermissionIdentity($resourceIdentity = null, $permissionIdentity = null): ?string
-//    {
-//        if ($permissionIdentity === null || $resourceIdentity === null) {
-//            return $permissionIdentity;
-//        }
-//
-//        return $resourceIdentity.'.'.$permissionIdentity;
-//    }
-
     /**
      * @return string|null
      */
     protected function getCachedData(): ?string
     {
         // Get data from cache
-        return $this->cache->fetch($this->getCacheKey());
+        return $this->cache->get($this->getCacheKey());
     }
 
     protected function putDataInCache(): bool
@@ -476,7 +457,7 @@ class Acl implements AclInterface
         $data = serialize($this->acl);
 
         // Store in cache
-        return $this->cache->save($this->getCacheKey(), $data);
+        return $this->cache->set($this->getCacheKey(), $data);
     }
 
     /**
@@ -496,15 +477,17 @@ class Acl implements AclInterface
 
         $this->logger && $this->logger->debug('Loading Acl from cached data');
 
-        $this->acl = unserialize($data, [
+        $obj = unserialize($data, [
             ZendAcl::class,
         ]);
 
-        if (!($this->acl && $this->acl instanceof ZendAcl)) {
+        if (!($obj instanceof ZendAcl)) {
             throw new AclException('Cached data is not an Acl instance, :type given', [
                 ':type' => \gettype($this->acl),
             ]);
         }
+
+        $this->acl = $obj;
 
         return true;
     }
