@@ -10,8 +10,8 @@ use Spotman\Acl\ResourceFactory\AclResourceFactoryInterface;
 use Spotman\Acl\ResourcesCollector\AclResourcesCollectorInterface;
 use Spotman\Acl\RolesCollector\AclRolesCollectorInterface;
 use Spotman\Acl\RulesCollector\AclRulesCollectorInterface;
-use Zend\Permissions\Acl\Acl as ZendAcl;
-use Zend\Permissions\Acl\Role\RoleInterface;
+use Laminas\Permissions\Acl\Acl as LaminasAcl;
+use Laminas\Permissions\Acl\Role\RoleInterface;
 
 class Acl implements AclInterface
 {
@@ -23,9 +23,9 @@ class Acl implements AclInterface
     private ?LoggerInterface $logger = null;
 
     /**
-     * @var \Zend\Permissions\Acl\Acl
+     * @var \Laminas\Permissions\Acl\Acl
      */
-    private ZendAcl $acl;
+    private LaminasAcl $acl;
 
     /**
      * @var AclResourcesCollectorInterface
@@ -108,7 +108,7 @@ class Acl implements AclInterface
         }
 
         // Normal initialization if no cache data provided
-        $this->acl = new ZendAcl();
+        $this->acl = new LaminasAcl();
 
         // Collect roles
         $this->rolesCollector->collectRoles($this);
@@ -168,7 +168,7 @@ class Acl implements AclInterface
      * @param string $identity
      *
      * @return \Spotman\Acl\ResourceInterface
-     * @throws \Zend\Permissions\Acl\Exception\InvalidArgumentException
+     * @throws \Laminas\Permissions\Acl\Exception\InvalidArgumentException
      * @throws \Spotman\Acl\AclException
      */
     public function getResource(string $identity): ResourceInterface
@@ -185,7 +185,7 @@ class Acl implements AclInterface
      * @param array|null $parentRolesIdentities
      *
      * @return \Spotman\Acl\AclInterface
-     * @throws \Zend\Permissions\Acl\Exception\InvalidArgumentException
+     * @throws \Laminas\Permissions\Acl\Exception\InvalidArgumentException
      */
     public function addRole(string $roleIdentity, array $parentRolesIdentities = null): AclInterface
     {
@@ -343,7 +343,7 @@ class Acl implements AclInterface
      * @param \Spotman\Acl\AclUserInterface  $user
      *
      * @return bool
-     * @throws \Zend\Permissions\Acl\Exception\InvalidArgumentException
+     * @throws \Laminas\Permissions\Acl\Exception\InvalidArgumentException
      */
     public function isAllowedToUser(
         ResourceInterface $resource,
@@ -478,10 +478,10 @@ class Acl implements AclInterface
         $this->logger && $this->logger->debug('Loading Acl from cached data');
 
         $obj = unserialize($data, [
-            ZendAcl::class,
+            LaminasAcl::class,
         ]);
 
-        if (!($obj instanceof ZendAcl)) {
+        if (!($obj instanceof LaminasAcl)) {
             throw new AclException('Cached data is not an Acl instance, :type given', [
                 ':type' => \gettype($this->acl),
             ]);

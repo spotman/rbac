@@ -1,7 +1,7 @@
 <?php
 namespace Spotman\Acl;
 
-interface ResourceInterface extends \Zend\Permissions\Acl\Resource\ResourceInterface
+interface ResourceInterface extends \Laminas\Permissions\Acl\Resource\ResourceInterface
 {
     public const SUFFIX = 'Resource';
 

@@ -1,4 +1,4 @@
 <?php
 namespace Spotman\Acl;
 
-interface AclRoleInterface extends \Zend\Permissions\Acl\Role\RoleInterface {}
+interface AclRoleInterface extends \Laminas\Permissions\Acl\Role\RoleInterface {}

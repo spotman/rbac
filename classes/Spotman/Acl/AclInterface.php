@@ -3,7 +3,7 @@ namespace Spotman\Acl;
 
 use Psr\Log\LoggerInterface;
 use Spotman\Acl\Resource\ResolvingResourceInterface;
-use Zend\Permissions\Acl\Role\RoleInterface;
+use Laminas\Permissions\Acl\Role\RoleInterface;
 
 interface AclInterface
 {
@@ -137,7 +137,7 @@ interface AclInterface
      * Returns true if User has assigned role
      *
      * @param \Spotman\Acl\AclUserInterface            $user
-     * @param \Zend\Permissions\Acl\Role\RoleInterface $role
+     * @param \Laminas\Permissions\Acl\Role\RoleInterface $role
      *
      * @return bool
      */
